@@ -1,0 +1,86 @@
+{
+  "id": "set_2_1",
+  "title": "Kitchen 1",
+  "image": "photos/2/1.jpg",
+  "size": [
+    1280,
+    1707
+  ],
+  "b1_features": "output/b1/set_2_1/features.npz",
+  "input_count": 500,
+  "descriptor_count": 500,
+  "border_rejected": 0,
+  "low_contrast_rejected": 0,
+  "descriptor_shape": [
+    500,
+    64
+  ],
+  "max_absolute_mean": 5.960464477539063e-08,
+  "max_std_error": 5.960464477539063e-08,
+  "annotated": "output/b2/set_2_1/examples.jpg",
+  "examples": [
+    {
+      "number": 1,
+      "descriptor_index": 0,
+      "point": [
+        795,
+        965
+      ],
+      "raw_patch": "output/b2/set_2_1/patch_1_40.png",
+      "normalized_patch": "output/b2/set_2_1/patch_1_8.png"
+    },
+    {
+      "number": 2,
+      "descriptor_index": 1,
+      "point": [
+        922,
+        1647
+      ],
+      "raw_patch": "output/b2/set_2_1/patch_2_40.png",
+      "normalized_patch": "output/b2/set_2_1/patch_2_8.png"
+    },
+    {
+      "number": 3,
+      "descriptor_index": 2,
+      "point": [
+        1015,
+        920
+      ],
+      "raw_patch": "output/b2/set_2_1/patch_3_40.png",
+      "normalized_patch": "output/b2/set_2_1/patch_3_8.png"
+    },
+    {
+      "number": 4,
+      "descriptor_index": 10,
+      "point": [
+        1202,
+        1174
+      ],
+      "raw_patch": "output/b2/set_2_1/patch_4_40.png",
+      "normalized_patch": "output/b2/set_2_1/patch_4_8.png"
+    },
+    {
+      "number": 5,
+      "descriptor_index": 6,
+      "point": [
+        276,
+        725
+      ],
+      "raw_patch": "output/b2/set_2_1/patch_5_40.png",
+      "normalized_patch": "output/b2/set_2_1/patch_5_8.png"
+    },
+    {
+      "number": 6,
+      "descriptor_index": 8,
+      "point": [
+        374,
+        1259
+      ],
+      "raw_patch": "output/b2/set_2_1/patch_6_40.png",
+      "normalized_patch": "output/b2/set_2_1/patch_6_8.png"
+    }
+  ],
+  "features": "output/b2/set_2_1/descriptors.npz",
+  "csv": "output/b2/set_2_1/descriptors.csv",
+  "record_path": "output/b2/set_2_1/descriptors.json"
+}

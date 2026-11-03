@@ -1,0 +1,111 @@
+{
+  "id": "cabinet",
+  "title": "Kitchen cabinets",
+  "image": "photos/2/3.jpg",
+  "source_size": [
+    1280,
+    1707
+  ],
+  "source_points": [
+    [
+      252.428,
+      592.612
+    ],
+    [
+      504.031,
+      607.168
+    ],
+    [
+      506.111,
+      813.025
+    ],
+    [
+      259.706,
+      816.144
+    ]
+  ],
+  "target_size": [
+    840,
+    400
+  ],
+  "zoom_box": [
+    380,
+    160,
+    460,
+    240
+  ],
+  "selected_by": "user",
+  "target_points": [
+    [
+      0.0,
+      0.0
+    ],
+    [
+      839.0,
+      0.0
+    ],
+    [
+      839.0,
+      399.0
+    ],
+    [
+      0.0,
+      399.0
+    ]
+  ],
+  "H": [
+    [
+      2.733225200102911,
+      -0.08899134354968874,
+      -637.2052327279084
+    ],
+    [
+      -0.09010094636953635,
+      1.5574105804764475,
+      -900.1961972271396
+    ],
+    [
+      -0.00027611541826617686,
+      -7.036213877184825e-05,
+      1.0
+    ]
+  ],
+  "corner_fit_max_error_px": 1.3589889175539397e-12,
+  "valid_pixel_count": 336000,
+  "source_crop_box": [
+    214,
+    559,
+    545,
+    850
+  ],
+  "zoom_scale": 4,
+  "source_crop": "output/a3/cabinet/source_crop.png",
+  "source_annotated": "output/a3/cabinet/source_points.png",
+  "nearest_image": "output/a3/cabinet/nearest.png",
+  "bilinear_image": "output/a3/cabinet/bilinear.png",
+  "detail_nearest": "output/a3/cabinet/detail_nearest.png",
+  "detail_bilinear": "output/a3/cabinet/detail_bilinear.png",
+  "record_path": "output/a3/cabinet/rectification.json",
+  "nearest_ms": 11.638299998594448,
+  "bilinear_ms": 44.14559999713674,
+  "raw_timings_ms": {
+    "nearest": [
+      12.896999993245117,
+      12.885799995274283,
+      13.424200005829334,
+      11.183800001163036,
+      11.638299998594448,
+      11.307399996439926,
+      11.25490000413265
+    ],
+    "bilinear": [
+      44.27959999884479,
+      43.087899990496226,
+      44.80139999941457,
+      43.74839999945834,
+      44.728099994244985,
+      44.14559999713674,
+      42.759900010423735
+    ]
+  }
+}

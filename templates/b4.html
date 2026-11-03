@@ -1,0 +1,23 @@
+<p>I use four-point RANSAC on the B.3 matches. I repeatedly sample four pairs, calculate H, and count matches with a reprojection error below $threshold px, where error = ||position predicted by H − B.3 matched position||<sub>2</sub>. I skip degenerate samples, keep the largest consensus, and refit H using its inliers. The automatic H matrices use only automatically matched points. Then I use the method in A.4 to merge the pictures.</p>
+$mosaics
+<p class="small">Both methods use the same original photos, reference view, bilinear warping, and six-level Laplacian blending. Uncropped images show each complete canvas, fitted to its column. The cropped comparisons use identical reference coordinates and the largest rectangle valid in both results.</p>
+<details><summary>RANSAC inliers and H matrices</summary>
+<label class="pair-label" for="ransac-select">Image pair <select id="ransac-select">$pair_options</select></label>
+$pair_panels
+</details>
+<h3>Four-point RANSAC</h3>
+<pre>error_i = ||project(H p_i) − q_i||₂
+inlier if error_i &lt; $threshold pixels</pre>
+<pre><code>sample = rng.choice(len(source), 4, replace=False)
+H = computeH(source[sample], target[sample])
+errors = reprojection_errors(source, target, H)
+inliers = errors &lt; threshold_px
+score = (int(inliers.sum()), -float(np.sum(errors[inliers]**2)))
+if score &gt; best_score:
+    best_score, best_mask = score, inliers
+H = computeH(source[best_mask], target[best_mask])</code></pre>
+<p class="small">The threshold is measured in original target-image pixels. Sampling uses fixed seeds starting at $seed, an adaptive 99.9% confidence estimate, at least $min_hypotheses valid hypotheses, and at most $max_trials draws. After refitting, I recalculate the inliers until the set stabilizes or repeats. <a href="ransac.py">Full RANSAC source</a> · <a href="b4_autostitch.py">Generation script</a></p>
+<div class="table-wrap"><table><thead><tr><th>Pair</th><th>B.3 matches</th><th>Inliers</th><th>Inlier ratio</th><th>Inlier RMSE / px</th></tr></thead><tbody>$result_rows</tbody></table></div>
+<p class="small">RMSE is measured on the selected inliers, so it does not measure independent alignment accuracy across the whole scene. <a href="output/b4/summary.csv">Result data</a></p>
+<p>$weakest_pair has the fewest inliers ($weakest_count), so its homography is supported by fewer features. RANSAC rejects inconsistent matches, but a single H still cannot align every depth when the photos contain parallax. For example, the roof edge is still misaligned. One possible reason is that I accidentally translated my phone while rotating it to take the pictures. <a href="https://visionbook.mit.edu/homography.html">Foundations of Computer Vision, Section 41.3</a> explains that panorama images should be taken by rotating the camera without translation.</p>
+<p>The manual and automatic results are broadly similar for Outdoor 1 + 2. The automatic Outdoor 3 + 4 result shows more foreground stretching. In the kitchen, the alignment between pictures 2 and 3 looks better because the cupboards line up this time. However, a funny thing is that the orange cup seems to have disappeared. This might be because, due to the misalignment, the cup appears in different positions in the two photos, and the blending seam happens to discard the portions of both photos that contain the cup.</p>

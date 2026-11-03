@@ -1,0 +1,131 @@
+{
+  "id": "outdoor_1_2",
+  "title": "Outdoor 1 + 2",
+  "sources": [
+    "photos/1/1.jpg",
+    "photos/1/2.jpg"
+  ],
+  "reference_image": "photos/1/2.jpg",
+  "automatic_source_to_reference_H": [
+    [
+      [
+        0.0025888355700969447,
+        -0.00021868687939079375,
+        -1.0
+      ],
+      [
+        0.000498279214975447,
+        0.0023400882586034773,
+        -0.4286858954201761
+      ],
+      [
+        6.080140007848684e-07,
+        -1.4527458727569082e-08,
+        0.0018308538869612166
+      ]
+    ],
+    [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  ],
+  "automatic_source_to_canvas_H": [
+    [
+      [
+        0.0030515342246942296,
+        -0.0002297422754824738,
+        0.39327980797748585
+      ],
+      [
+        0.000641162505159891,
+        0.0023366743058024987,
+        0.001564768015709806
+      ],
+      [
+        6.080140007848684e-07,
+        -1.4527458727569082e-08,
+        0.0018308538869612166
+      ]
+    ],
+    [
+      [
+        1.0,
+        0.0,
+        761.0
+      ],
+      [
+        0.0,
+        1.0,
+        235.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  ],
+  "automatic_origin_xy": [
+    -761,
+    -235
+  ],
+  "automatic_size": [
+    2041,
+    2210
+  ],
+  "manual_record": "output/a4/outdoor_1_2/mosaic.json",
+  "manual_full": "output/a4/outdoor_1_2/laplacian.png",
+  "automatic_full": "output/b4/mosaics/outdoor_1_2/automatic_laplacian.png",
+  "automatic_feather": "output/b4/mosaics/outdoor_1_2/automatic_feather.png",
+  "manual_comparison": "output/b4/mosaics/outdoor_1_2/manual_comparison.png",
+  "automatic_comparison": "output/b4/mosaics/outdoor_1_2/automatic_comparison.png",
+  "comparison_size": [
+    1847,
+    1707
+  ],
+  "common_reference_box_ltrb": [
+    -567,
+    0,
+    1280,
+    1707
+  ],
+  "manual_crop_box_ltrb": [
+    228,
+    219,
+    2075,
+    1926
+  ],
+  "automatic_crop_box_ltrb": [
+    194,
+    235,
+    2041,
+    1942
+  ],
+  "detail_box_in_common_crop": [
+    775,
+    768,
+    1329,
+    1450
+  ],
+  "manual_detail": "output/b4/mosaics/outdoor_1_2/manual_detail.png",
+  "automatic_detail": "output/b4/mosaics/outdoor_1_2/automatic_detail.png",
+  "valid_mask": "output/b4/mosaics/outdoor_1_2/valid_mask.png",
+  "coverage": "output/b4/mosaics/outdoor_1_2/coverage.png",
+  "record_path": "output/b4/mosaics/outdoor_1_2/mosaic.json",
+  "pair_ids": [
+    "set_1_1_to_2"
+  ]
+}

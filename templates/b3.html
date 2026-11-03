@@ -1,0 +1,20 @@
+<p>I compare each 64-value descriptor in the left image with all descriptors in the right image. I find its nearest and second-nearest neighbors and keep the nearest match only when its distance is clearly smaller.</p>
+<label class="pair-label" for="match-select">Image pair <select id="match-select">$options</select></label>
+$panels
+<h3>Nearest-neighbor ratio test</h3>
+<div class="math-equations"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><msub><mi>d</mi><mn>1</mn></msub><msub><mi>d</mi><mn>2</mn></msub></mfrac><mo>&lt;</mo><mn>$ratio_threshold</mn></mrow></math></div>
+<p>d<sub>1</sub> and d<sub>2</sub> are the Euclidean distances to the closest and second-closest descriptors. I choose a threshold of $ratio_threshold; this corresponds to $squared_threshold for squared distances, as plotted in Figure 6b of the paper. Two zero-distance neighbors are ambiguous and are rejected.</p>
+<p>I also tried a threshold of 0.6, which removed 126 more matches compared with 0.7. Although it is stricter, it may also exclude correct matches, so I keep the threshold at 0.7.</p>
+<h3>Core code</h3>
+<pre><code>squared = np.maximum(np.sum(queries*queries, axis=1)[:, None]
+                     + norm_b[None, :] - 2*queries @ b.T, 0)
+order = np.argsort(squared, axis=1, kind="stable")[:, :2]
+rows = np.arange(stop-start)
+e1, e2 = squared[rows, order[:, 0]], squared[rows, order[:, 1]]
+squared_ratio = np.divide(e1, e2, out=np.full_like(e1, np.inf), where=e2 &gt; 1e-12)
+ratios[start:stop] = np.sqrt(squared_ratio)
+accepted = ratios &lt; ratio_threshold</code></pre>
+<p class="small"><a href="feature_matching.py">Matching source</a> · <a href="b3_match_features.py">Generation script</a> · <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2005/06/cvpr05.pdf#page=4" target="_blank" rel="noopener">Brown et al., Figure 6b and Section 5</a></p>
+<div class="table-wrap"><table><thead><tr><th>Pair</th><th>Matches</th><th>Queries retained</th><th>Median ratio</th></tr></thead><tbody>$result_rows</tbody></table></div>
+<p class="small">Matching runs from left to right. All retained correspondences are saved at the original resolution. The preview shows up to $preview_limit matches with the smallest ratios; the full figure includes every retained match. <a href="output/b3/summary.csv">Result data</a></p>
+<p>Repeated textures can still produce incorrect matches. These are descriptor-based candidates; B.4 uses RANSAC to check their geometric consistency.</p>

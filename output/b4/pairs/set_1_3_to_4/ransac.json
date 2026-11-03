@@ -1,0 +1,68 @@
+{
+  "id": "set_1_3_to_4",
+  "title": "Outdoor 3 \u2192 4",
+  "image1": "photos/1/3.jpg",
+  "image2": "photos/1/4.jpg",
+  "b3_matches": "output/b3/set_1_3_to_4/matches.npz",
+  "b3_ratio_threshold": 0.7,
+  "direction": "image1 -> image2",
+  "H": [
+    [
+      2.2023190576193623,
+      -0.03086266379083016,
+      -2030.1489312402907
+    ],
+    [
+      0.9193161194652587,
+      2.0332639879035486,
+      -887.9672970527793
+    ],
+    [
+      0.0010518335605833185,
+      -7.191505028302197e-05,
+      1.0
+    ]
+  ],
+  "match_count": 22,
+  "inlier_count": 8,
+  "inlier_percent": 36.36363636363637,
+  "inlier_rmse_px": 1.1221247595962647,
+  "inlier_max_error_px": 1.5882145461989543,
+  "threshold_px": 3.0,
+  "seed": 673,
+  "max_trials": 5000,
+  "trials": 404,
+  "valid_hypotheses": 392,
+  "skipped_samples": 12,
+  "refit_steps": 1,
+  "consensus_stable": true,
+  "inlier_match_indices": [
+    2,
+    3,
+    6,
+    11,
+    12,
+    13,
+    19,
+    20
+  ],
+  "fit_match_indices": [
+    2,
+    3,
+    6,
+    11,
+    12,
+    13,
+    19,
+    20
+  ],
+  "inliers_image": "output/b4/pairs/set_1_3_to_4/inliers.jpg",
+  "rejected_image": "output/b4/pairs/set_1_3_to_4/rejected.jpg",
+  "figure_size": [
+    2592,
+    1749
+  ],
+  "features": "output/b4/pairs/set_1_3_to_4/ransac.npz",
+  "errors_csv": "output/b4/pairs/set_1_3_to_4/point_errors.csv",
+  "record_path": "output/b4/pairs/set_1_3_to_4/ransac.json"
+}

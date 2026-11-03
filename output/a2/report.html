@@ -1,0 +1,236 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<title>A.2 — Recover Homographies</title><link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><style>
+body{font:16px/1.6 Arial,Helvetica,sans-serif;color:#171717;max-width:1120px;margin:40px auto;padding:0 24px;background:white}
+h1,h2,h3{line-height:1.2;color:#171717}h1{font-size:36px;letter-spacing:-1px}h2{margin-top:45px;border-top:2px solid #fbd54b;padding-top:24px}
+table{border-collapse:collapse;width:100%;margin:18px 0;font-variant-numeric:tabular-nums;background:white;display:block;overflow:auto}th,td{border:1px solid #d8d8d5;padding:8px;text-align:right}th{background:#f3f3ef}th:first-child,td:first-child{text-align:left}
+pre{font:14px/1.6 Consolas,monospace;overflow:auto;background:#f3f3ef;padding:18px;border-left:4px solid #fbd54b}img{max-width:100%;height:auto}a{color:#171717;text-underline-offset:3px}
+.report-brand{background:#171717;color:white;border-top:5px solid #fbd54b;padding:18px 22px;font-size:11px;font-weight:bold;letter-spacing:1px}.report-home{display:inline-block;margin-top:18px;font-size:12px}
+.note{background:#fff2b6;padding:16px;border-left:4px solid #d3ae25}.small{font-size:14px}.reprojection{max-height:900px;width:auto}summary{cursor:pointer;font-weight:600}
+@media print{body{margin:0;background:white;font-size:11px}h2{break-before:page}pre{font-size:9px;white-space:pre-wrap}details>pre{display:block}img{max-height:800px}a{color:inherit}}
+</style><div class="report-brand">PHOTO OF THE WORLD / SYDE 671 / ASSIGNMENT 03</div><a class="report-home" href="../../index.html#homographies">← Return to the assignment</a><h1>A.2 — Recover Homographies</h1>
+<p>Manual correspondences are used to estimate a projective transformation between each adjacent image pair.
+All supplied points are used; no points are automatically removed. Each H maps <strong>image1 to image2</strong>.</p>
+<h2>Coordinate convention and linear system</h2>
+<p>Images are loaded with EXIF orientation applied, matching the annotation tool. Coordinates refer to the original image resolution;
+x increases rightward, y downward, and (0,0) is the center of the first pixel. Display resizing is used only for visualization.</p>
+<pre>[u, v, 1]^T ~ H [x, y, 1]^T
+
+    [ h11 h12 h13 ]
+H = [ h21 h22 h23 ],   h33 = 1
+    [ h31 h32  1  ]
+
+u = (h11*x + h12*y + h13) / (h31*x + h32*y + 1)
+v = (h21*x + h22*y + h23) / (h31*x + h32*y + 1)
+
+For each correspondence (x,y) -> (u,v):
+[ x  y  1  0  0  0  -u*x  -u*y ] h = u
+[ 0  0  0  x  y  1  -v*x  -v*y ] h = v
+
+h = [h11, h12, h13, h21, h22, h23, h31, h32]^T
+A has shape (2n,8), b = [u1,v1,u2,v2,...]^T
+
+h* = argmin_h ||A h - b||_2^2
+s_j = ||A[:,j]||_2; replace a zero scale with 1
+z = numpy.linalg.lstsq(A / s, b, rcond=None)[0]
+h = z / s</pre>
+<p>Every pair contains more than four correspondences, so the system is overdetermined. Column scaling improves numerical conditioning
+without changing the original-pixel algebraic least-squares objective. The solver uses NumPy linear algebra, rather than a homography library.
+This linear fit minimizes algebraic residuals; it does not directly minimize geometric reprojection distances.</p>
+<p>Validation measures forward errors in original target-image pixels:
+<code>e_i = ||project(H, p_i) - q_i||_2</code>,
+<code>RMSE = sqrt(mean(e_i^2))</code>. These are errors on the same points used to fit H, not held-out accuracy.</p>
+<h2>Results overview</h2><table><tr><th>Pair</th><th>Points</th><th>System</th><th>Rank</th><th>Mean (px)</th><th>RMSE (px)</th><th>Maximum (px)</th></tr>
+<tr><td><a href="#set_1_1_to_2">set_1_1_to_2</a></td><td>8</td><td>16 × 8</td><td>8</td><td>10.466</td><td>12.368</td><td>20.602</td></tr>
+<tr><td><a href="#set_1_2_to_3">set_1_2_to_3</a></td><td>8</td><td>16 × 8</td><td>8</td><td>6.849</td><td>7.284</td><td>10.318</td></tr>
+<tr><td><a href="#set_1_3_to_4">set_1_3_to_4</a></td><td>9</td><td>18 × 8</td><td>8</td><td>7.333</td><td>8.042</td><td>13.600</td></tr>
+<tr><td><a href="#set_2_1_to_2">set_2_1_to_2</a></td><td>8</td><td>16 × 8</td><td>8</td><td>3.783</td><td>4.193</td><td>7.445</td></tr>
+<tr><td><a href="#set_2_2_to_3">set_2_2_to_3</a></td><td>8</td><td>16 × 8</td><td>8</td><td>15.199</td><td>18.282</td><td>37.030</td></tr>
+</table><p class="note">Larger residuals can arise from inaccurate clicks, parallax from camera translation, or lens distortion. The residuals alone cannot identify the cause. Inspect the labeled points before proceeding to A.3; do not interpret a full-rank system as proof of accurate alignment.</p>
+<h2 id="set_1_1_to_2">set_1_1_to_2</h2><p>photos/1/1.jpg → photos/1/2.jpg</p>
+<h3>Manual correspondences</h3><a href="set_1_1_to_2/correspondences.png"><img src="set_1_1_to_2/correspondences.png" alt="Numbered manual point matches"></a>
+<h3>Recovered H (image1 → image2)</h3><pre>[  1.349652912  -0.09139260185  -543.5512466 ]
+[  0.3204902821   1.182029319  -218.6698647 ]
+[  0.0003640039329  -6.981694725e-05   1 ]</pre>
+<p>Full-precision outputs: <a href="set_1_1_to_2/homography.json">H and diagnostics (JSON)</a> · <a href="set_1_1_to_2/H.npy">H (NumPy)</a> · <a href="set_1_1_to_2/H.csv">H (CSV)</a></p>
+<p>Rank: 8/8. Condition number: raw A = 5.041e+07; column-scaled A = 158.4.</p>
+<details open><summary>Numerical system A h = b (16 equations)</summary><pre>Each row below is [A | b]:
+[  826.974   930.292   1   0   0   0  -338454.822  -380739.6765   409.269 ]
+[  0   0   0   826.974   930.292   1  -777487.0489  -874622.3964   940.159 ]
+[  978.269   917.136   1   0   0   0  -525858.7183  -492997.2854   537.54 ]
+[  0   0   0   978.269   917.136   1  -897205.7176  -841138.4425   917.136 ]
+[  1024.315   1084.876   1   0   0   0  -580932.0577  -615278.7444   567.142 ]
+[  0   0   0   1024.315   1084.876   1  -1094409.9  -1159115.15   1068.431 ]
+[  751.327   877.668   1   0   0   0  -255600.6941  -298581.7759   340.199 ]
+[  0   0   0   751.327   877.668   1  -649531.2074  -758754.518   864.512 ]
+[  1007.87   486.275   1   0   0   0  -578235.1764  -278985.693   573.72 ]
+[  0   0   0   1007.87   486.275   1  -509991.2908  -246059.5265   506.009 ]
+[  567.142   690.194   1   0   0   0  -69828.79161  -84979.44606   123.124 ]
+[  0   0   0   567.142   690.194   1  -382111.3554  -465017.5173   673.749 ]
+[  810.529   1384.176   1   0   0   0  -278406.9852  -475447.8459   343.488 ]
+[  0   0   0   810.529   1384.176   1  -1132578.109  -1934153.418   1397.332 ]
+[  1244.679   861.223   1   0   0   0  -943348.4375  -652725.2178   757.905 ]
+[  0   0   0   1244.679   861.223   1  -1071946.182  -741705.0557   861.223 ]</pre></details>
+<p>The CSV preserves the numeric coefficients: <a href="set_1_1_to_2/linear_system.csv">[A | b] (CSV)</a> · <a href="set_1_1_to_2/linear_system.npz">A, b, h and column scales (NumPy)</a>.</p>
+<h3>Reprojection diagnostics</h3><table><tr><th>Point</th><th>x</th><th>y</th><th>u marked</th><th>v marked</th><th>u projected</th><th>v projected</th><th>Error (px)</th></tr>
+<tr><td>1</td><td>826.974</td><td>930.292</td><td>409.269</td><td>940.159</td><td>394.439</td><td>927.130</td><td>19.740</td></tr>
+<tr><td>2</td><td>978.269</td><td>917.136</td><td>537.540</td><td>917.136</td><td>536.315</td><td>912.446</td><td>4.847</td></tr>
+<tr><td>3</td><td>1024.315</td><td>1084.876</td><td>567.142</td><td>1068.431</td><td>570.320</td><td>1073.129</td><td>5.672</td></tr>
+<tr><td>4</td><td>751.327</td><td>877.668</td><td>340.199</td><td>864.512</td><td>321.947</td><td>874.067</td><td>20.602</td></tr>
+<tr><td>5</td><td>1007.870</td><td>486.275</td><td>573.720</td><td>506.009</td><td>579.391</td><td>509.509</td><td>6.664</td></tr>
+<tr><td>6</td><td>567.142</td><td>690.194</td><td>123.124</td><td>673.749</td><td>137.116</td><td>672.497</td><td>14.048</td></tr>
+<tr><td>7</td><td>810.529</td><td>1384.176</td><td>343.488</td><td>1397.332</td><td>353.704</td><td>1399.564</td><td>10.457</td></tr>
+<tr><td>8</td><td>1244.679</td><td>861.223</td><td>757.905</td><td>861.223</td><td>759.275</td><td>860.215</td><td>1.700</td></tr>
+</table><p>Forward RMSE: <strong>12.368 px</strong>. Largest error: point 4, 20.602 px. <a href="set_1_1_to_2/point_errors.csv">Download point errors</a>.</p>
+<a href="set_1_1_to_2/reprojection.png"><img class="reprojection" src="set_1_1_to_2/reprojection.png" alt="Manual targets and homography projections"></a>
+<h2 id="set_1_2_to_3">set_1_2_to_3</h2><p>photos/1/2.jpg → photos/1/3.jpg</p>
+<h3>Manual correspondences</h3><a href="set_1_2_to_3/correspondences.png"><img src="set_1_2_to_3/correspondences.png" alt="Numbered manual point matches"></a>
+<h3>Recovered H (image1 → image2)</h3><pre>[  1.722219528   0.04457771508  -914.0772292 ]
+[  0.3551440725   1.552842704  -311.4954142 ]
+[  0.0004788338246   0.0001092991172   1 ]</pre>
+<p>Full-precision outputs: <a href="set_1_2_to_3/homography.json">H and diagnostics (JSON)</a> · <a href="set_1_2_to_3/H.npy">H (NumPy)</a> · <a href="set_1_2_to_3/H.csv">H (CSV)</a></p>
+<p>Rank: 8/8. Condition number: raw A = 4.536e+07; column-scaled A = 144.7.</p>
+<details open><summary>Numerical system A h = b (16 equations)</summary><pre>Each row below is [A | b]:
+[  945.379   959.893   1   0   0   0  -461538.7547  -468624.5621   488.205 ]
+[  0   0   0   945.379   959.893   1  -916790.739  -930865.8357   969.76 ]
+[  672.39   1061.853   1   0   0   0  -138075.2865  -218051.5136   205.35 ]
+[  0   0   0   672.39   1061.853   1  -742728.7179  -1172933.442   1104.61 ]
+[  1228.234   831.621   1   0   0   0  -894526.5069  -605672.0692   728.303 ]
+[  0   0   0   1228.234   831.621   1  -1041623.495  -705269.495   848.066 ]
+[  540.829   910.558   1   0   0   0  -22119.36527  -37240.91164   40.899 ]
+[  0   0   0   540.829   910.558   1  -512022.825  -862058.9492   946.737 ]
+[  1063.783   473.118   1   0   0   0  -648800.1879  -288554.1951   609.899 ]
+[  0   0   0   1063.783   473.118   1  -541782.5543  -240958.0512   509.298 ]
+[  909.199   269.199   1   0   0   0  -405000.8762  -119914.1562   445.448 ]
+[  0   0   0   909.199   269.199   1  -268679.2149  -79551.53489   295.512 ]
+[  1247.968   404.049   1   0   0   0  -958154.8873  -310217.5088   767.772 ]
+[  0   0   0   1247.968   404.049   1  -578122.424  -187176.1033   463.251 ]
+[  1241.39   1022.384   1   0   0   0  -924523.9611  -761419.4616   744.749 ]
+[  0   0   0   1241.39   1022.384   1  -1244679.684  -1025093.318   1002.65 ]</pre></details>
+<p>The CSV preserves the numeric coefficients: <a href="set_1_2_to_3/linear_system.csv">[A | b] (CSV)</a> · <a href="set_1_2_to_3/linear_system.npz">A, b, h and column scales (NumPy)</a>.</p>
+<h3>Reprojection diagnostics</h3><table><tr><th>Point</th><th>x</th><th>y</th><th>u marked</th><th>v marked</th><th>u projected</th><th>v projected</th><th>Error (px)</th></tr>
+<tr><td>1</td><td>945.379</td><td>959.893</td><td>488.205</td><td>969.760</td><td>485.918</td><td>972.533</td><td>3.595</td></tr>
+<tr><td>2</td><td>672.390</td><td>1061.853</td><td>205.350</td><td>1104.610</td><td>202.543</td><td>1096.082</td><td>8.978</td></tr>
+<tr><td>3</td><td>1228.234</td><td>831.621</td><td>728.303</td><td>848.066</td><td>737.506</td><td>843.400</td><td>10.318</td></tr>
+<tr><td>4</td><td>540.829</td><td>910.558</td><td>40.899</td><td>946.737</td><td>42.650</td><td>952.918</td><td>6.424</td></tr>
+<tr><td>5</td><td>1063.783</td><td>473.118</td><td>609.899</td><td>509.298</td><td>601.556</td><td>513.090</td><td>9.164</td></tr>
+<tr><td>6</td><td>909.199</td><td>269.199</td><td>445.448</td><td>295.512</td><td>453.149</td><td>293.167</td><td>8.050</td></tr>
+<tr><td>7</td><td>1247.968</td><td>404.049</td><td>767.772</td><td>463.251</td><td>763.346</td><td>462.401</td><td>4.507</td></tr>
+<tr><td>8</td><td>1241.390</td><td>1022.384</td><td>744.749</td><td>1002.650</td><td>744.034</td><td>1006.338</td><td>3.756</td></tr>
+</table><p>Forward RMSE: <strong>7.284 px</strong>. Largest error: point 3, 10.318 px. <a href="set_1_2_to_3/point_errors.csv">Download point errors</a>.</p>
+<a href="set_1_2_to_3/reprojection.png"><img class="reprojection" src="set_1_2_to_3/reprojection.png" alt="Manual targets and homography projections"></a>
+<h2 id="set_1_3_to_4">set_1_3_to_4</h2><p>photos/1/3.jpg → photos/1/4.jpg</p>
+<h3>Manual correspondences</h3><a href="set_1_3_to_4/correspondences.png"><img src="set_1_3_to_4/correspondences.png" alt="Numbered manual point matches"></a>
+<h3>Recovered H (image1 → image2)</h3><pre>[  1.68566096  -0.04215258004  -1551.436581 ]
+[  0.5516907493   1.559060301  -532.7346435 ]
+[  0.0005606039274  -2.388475365e-05   1 ]</pre>
+<p>Full-precision outputs: <a href="set_1_3_to_4/homography.json">H and diagnostics (JSON)</a> · <a href="set_1_3_to_4/H.npy">H (NumPy)</a> · <a href="set_1_3_to_4/H.csv">H (CSV)</a></p>
+<p>Rank: 8/8. Condition number: raw A = 1.091e+08; column-scaled A = 412.8.</p>
+<details open><summary>Numerical system A h = b (18 equations)</summary><pre>Each row below is [A | b]:
+[  1060.494   834.91   1   0   0   0  -130572.2633  -102797.4588   123.124 ]
+[  0   0   0   1060.494   834.91   1  -913321.8242  -719043.6949   861.223 ]
+[  1011.159   966.471   1   0   0   0  -64635.3056  -61778.75926   63.922 ]
+[  0   0   0   1011.159   966.471   1  -1010512.869  -965853.425   999.361 ]
+[  1228.234   371.159   1   0   0   0  -365328.3774  -110398.2753   297.442 ]
+[  0   0   0   1228.234   371.159   1  -532623.6741  -160953.1003   433.65 ]
+[  991.425   252.754   1   0   0   0  -63373.86885  -16156.54119   63.922 ]
+[  0   0   0   991.425   252.754   1  -260369.0249  -66378.50823   262.621 ]
+[  1188.766   644.147   1   0   0   0  -302760.8687  -164054.5787   254.685 ]
+[  0   0   0   1188.766   644.147   1  -816569.3092  -442467.795   686.905 ]
+[  1007.87   709.928   1   0   0   0  -84314.37272  -59389.73677   83.656 ]
+[  0   0   0   1007.87   709.928   1  -738719.3244  -520342.4375   732.951 ]
+[  945.379   325.113   1   0   0   0  -23118.29807  -7950.313302   24.454 ]
+[  0   0   0   945.379   325.113   1  -301136.2998  -103559.8695   318.535 ]
+[  1053.916   364.581   1   0   0   0  -143627.6725  -49685.09868   136.28 ]
+[  0   0   0   1053.916   364.581   1  -411968.387  -142512.1608   390.893 ]
+[  1182.188   996.072   1   0   0   0  -297197.3344  -250408.5165   251.396 ]
+[  0   0   0   1182.188   996.072   1  -1193097.231  -1005263.752   1009.228 ]</pre></details>
+<p>The CSV preserves the numeric coefficients: <a href="set_1_3_to_4/linear_system.csv">[A | b] (CSV)</a> · <a href="set_1_3_to_4/linear_system.npz">A, b, h and column scales (NumPy)</a>.</p>
+<h3>Reprojection diagnostics</h3><table><tr><th>Point</th><th>x</th><th>y</th><th>u marked</th><th>v marked</th><th>u projected</th><th>v projected</th><th>Error (px)</th></tr>
+<tr><td>1</td><td>1060.494</td><td>834.910</td><td>123.124</td><td>861.223</td><td>127.655</td><td>859.918</td><td>4.716</td></tr>
+<tr><td>2</td><td>1011.159</td><td>966.471</td><td>63.922</td><td>999.361</td><td>72.741</td><td>992.307</td><td>11.293</td></tr>
+<tr><td>3</td><td>1228.234</td><td>371.159</td><td>297.442</td><td>433.650</td><td>299.642</td><td>430.753</td><td>3.638</td></tr>
+<tr><td>4</td><td>991.425</td><td>252.754</td><td>63.922</td><td>262.621</td><td>70.408</td><td>263.450</td><td>6.539</td></tr>
+<tr><td>5</td><td>1188.766</td><td>644.147</td><td>254.685</td><td>686.905</td><td>257.575</td><td>682.818</td><td>5.006</td></tr>
+<tr><td>6</td><td>1007.870</td><td>709.928</td><td>83.656</td><td>732.951</td><td>75.944</td><td>730.023</td><td>8.250</td></tr>
+<tr><td>7</td><td>945.379</td><td>325.113</td><td>24.454</td><td>318.535</td><td>18.688</td><td>325.639</td><td>9.149</td></tr>
+<tr><td>8</td><td>1053.916</td><td>364.581</td><td>136.280</td><td>390.893</td><td>132.569</td><td>390.049</td><td>3.806</td></tr>
+<tr><td>9</td><td>1182.188</td><td>996.072</td><td>251.396</td><td>1009.228</td><td>243.659</td><td>1020.413</td><td>13.600</td></tr>
+</table><p>Forward RMSE: <strong>8.042 px</strong>. Largest error: point 9, 13.600 px. <a href="set_1_3_to_4/point_errors.csv">Download point errors</a>.</p>
+<a href="set_1_3_to_4/reprojection.png"><img class="reprojection" src="set_1_3_to_4/reprojection.png" alt="Manual targets and homography projections"></a>
+<h2 id="set_2_1_to_2">set_2_1_to_2</h2><p>photos/2/1.jpg → photos/2/2.jpg</p>
+<h3>Manual correspondences</h3><a href="set_2_1_to_2/correspondences.png"><img src="set_2_1_to_2/correspondences.png" alt="Numbered manual point matches"></a>
+<h3>Recovered H (image1 → image2)</h3><pre>[  1.301489927   0.02017097306  -450.7249237 ]
+[  0.21932816   1.141860558  -128.4548219 ]
+[  0.0002741537904  -4.864323875e-05   1 ]</pre>
+<p>Full-precision outputs: <a href="set_2_1_to_2/homography.json">H and diagnostics (JSON)</a> · <a href="set_2_1_to_2/H.npy">H (NumPy)</a> · <a href="set_2_1_to_2/H.csv">H (CSV)</a></p>
+<p>Rank: 8/8. Condition number: raw A = 5.566e+07; column-scaled A = 201.</p>
+<details open><summary>Numerical system A h = b (16 equations)</summary><pre>Each row below is [A | b]:
+[  935.512   469.829   1   0   0   0  -585952.3281  -294274.5752   626.344 ]
+[  0   0   0   935.512   469.829   1  -464146.7947  -233101.8997   496.142 ]
+[  810.529   703.35   1   0   0   0  -422362.6093  -366512.1683   521.095 ]
+[  0   0   0   810.529   703.35   1  -583414.7216  -506267.8133   719.795 ]
+[  1024.315   963.182   1   0   0   0  -746011.6874  -701488.3401   728.303 ]
+[  0   0   0   1024.315   963.182   1  -989970.7424  -930887.4707   966.471 ]
+[  672.39   920.425   1   0   0   0  -259707.9479  -355510.4745   386.246 ]
+[  0   0   0   672.39   920.425   1  -632153.51  -865345.8476   940.159 ]
+[  669.101   598.101   1   0   0   0  -251835.5653  -225112.6563   376.379 ]
+[  0   0   0   669.101   598.101   1  -404591.3236  -361659.1146   604.679 ]
+[  915.777   861.223   1   0   0   0  -576603.4198  -542254.4212   629.633 ]
+[  0   0   0   915.777   861.223   1  -794712.1964  -747370.1806   867.801 ]
+[  1037.471   802.02   1   0   0   0  -765831.0055  -592027.9054   738.171 ]
+[  0   0   0   1037.471   802.02   1  -852545.9441  -659063.1431   821.754 ]
+[  438.87   798.731   1   0   0   0  -55478.87331  -100969.9819   126.413 ]
+[  0   0   0   438.87   798.731   1  -357756.2911  -651106.3417   815.176 ]</pre></details>
+<p>The CSV preserves the numeric coefficients: <a href="set_2_1_to_2/linear_system.csv">[A | b] (CSV)</a> · <a href="set_2_1_to_2/linear_system.npz">A, b, h and column scales (NumPy)</a>.</p>
+<h3>Reprojection diagnostics</h3><table><tr><th>Point</th><th>x</th><th>y</th><th>u marked</th><th>v marked</th><th>u projected</th><th>v projected</th><th>Error (px)</th></tr>
+<tr><td>1</td><td>935.512</td><td>469.829</td><td>626.344</td><td>496.142</td><td>629.295</td><td>497.080</td><td>3.097</td></tr>
+<tr><td>2</td><td>810.529</td><td>703.350</td><td>521.095</td><td>719.795</td><td>520.505</td><td>717.548</td><td>2.323</td></tr>
+<tr><td>3</td><td>1024.315</td><td>963.182</td><td>728.303</td><td>966.471</td><td>730.845</td><td>969.252</td><td>3.768</td></tr>
+<tr><td>4</td><td>672.390</td><td>920.425</td><td>386.246</td><td>940.159</td><td>388.700</td><td>938.968</td><td>2.728</td></tr>
+<tr><td>5</td><td>669.101</td><td>598.101</td><td>376.379</td><td>604.679</td><td>374.384</td><td>607.485</td><td>3.443</td></tr>
+<tr><td>6</td><td>915.777</td><td>861.223</td><td>629.633</td><td>867.801</td><td>627.307</td><td>873.158</td><td>5.840</td></tr>
+<tr><td>7</td><td>1037.471</td><td>802.020</td><td>738.171</td><td>821.754</td><td>735.266</td><td>814.899</td><td>7.445</td></tr>
+<tr><td>8</td><td>438.870</td><td>798.731</td><td>126.413</td><td>815.176</td><td>126.283</td><td>813.564</td><td>1.617</td></tr>
+</table><p>Forward RMSE: <strong>4.193 px</strong>. Largest error: point 7, 7.445 px. <a href="set_2_1_to_2/point_errors.csv">Download point errors</a>.</p>
+<a href="set_2_1_to_2/reprojection.png"><img class="reprojection" src="set_2_1_to_2/reprojection.png" alt="Manual targets and homography projections"></a>
+<h2 id="set_2_2_to_3">set_2_2_to_3</h2><p>photos/2/2.jpg → photos/2/3.jpg</p>
+<h3>Manual correspondences</h3><a href="set_2_2_to_3/correspondences.png"><img src="set_2_2_to_3/correspondences.png" alt="Numbered manual point matches"></a>
+<h3>Recovered H (image1 → image2)</h3><pre>[  0.9399842348  -0.1362081275  -465.9029199 ]
+[  0.03083875908   0.8016378168   127.7786129 ]
+[  9.356481141e-05  -0.0001378975604   1 ]</pre>
+<p>Full-precision outputs: <a href="set_2_2_to_3/homography.json">H and diagnostics (JSON)</a> · <a href="set_2_2_to_3/H.npy">H (NumPy)</a> · <a href="set_2_2_to_3/H.csv">H (CSV)</a></p>
+<p>Rank: 8/8. Condition number: raw A = 6.432e+07; column-scaled A = 193.1.</p>
+<details open><summary>Numerical system A h = b (16 equations)</summary><pre>Each row below is [A | b]:
+[  1001.292   1318.396   1   0   0   0  -317585.7914  -418163.5697   317.176 ]
+[  0   0   0   1001.292   1318.396   1  -1323392.617  -1742504.217   1321.685 ]
+[  876.309   792.153   1   0   0   0  -231829.2986  -209565.6605   264.552 ]
+[  0   0   0   876.309   792.153   1  -705699.5245  -637927.9403   805.309 ]
+[  725.014   749.396   1   0   0   0  -72574.62641  -75015.289   100.101 ]
+[  0   0   0   725.014   749.396   1  -555245.4468  -573918.182   765.841 ]
+[  1254.546   933.581   1   0   0   0  -744515.3419  -554037.3788   593.454 ]
+[  0   0   0   1254.546   933.581   1  -1167094.107  -868502.9357   930.292 ]
+[  988.136   1042.118   1   0   0   0  -319912.9825  -337389.871   323.754 ]
+[  0   0   0   988.136   1042.118   1  -1036255.259  -1092866.02   1048.697 ]
+[  692.124   986.205   1   0   0   0  -35136.36698  -50065.68303   50.766 ]
+[  0   0   0   692.124   986.205   1  -712169.2953  -1014767.469   1028.962 ]
+[  1251.257   581.656   1   0   0   0  -759025.0088  -352838.3462   606.61 ]
+[  0   0   0   1251.257   581.656   1  -764839.6  -355541.3016   611.257 ]
+[  869.731   973.049   1   0   0   0  -232949.6208  -260622.4172   267.841 ]
+[  0   0   0   869.731   973.049   1  -863454.1514  -966026.5054   992.783 ]</pre></details>
+<p>The CSV preserves the numeric coefficients: <a href="set_2_2_to_3/linear_system.csv">[A | b] (CSV)</a> · <a href="set_2_2_to_3/linear_system.npz">A, b, h and column scales (NumPy)</a>.</p>
+<h3>Reprojection diagnostics</h3><table><tr><th>Point</th><th>x</th><th>y</th><th>u marked</th><th>v marked</th><th>u projected</th><th>v projected</th><th>Error (px)</th></tr>
+<tr><td>1</td><td>1001.292</td><td>1318.396</td><td>317.176</td><td>1321.685</td><td>324.296</td><td>1332.994</td><td>13.364</td></tr>
+<tr><td>2</td><td>876.309</td><td>792.153</td><td>264.552</td><td>805.309</td><td>256.916</td><td>811.944</td><td>10.116</td></tr>
+<tr><td>3</td><td>725.014</td><td>749.396</td><td>100.101</td><td>765.841</td><td>117.704</td><td>778.522</td><td>21.695</td></tr>
+<tr><td>4</td><td>1254.546</td><td>933.581</td><td>593.454</td><td>930.292</td><td>592.923</td><td>925.371</td><td>4.950</td></tr>
+<tr><td>5</td><td>988.136</td><td>1042.118</td><td>323.754</td><td>1048.697</td><td>338.324</td><td>1047.329</td><td>14.634</td></tr>
+<tr><td>6</td><td>692.124</td><td>986.205</td><td>50.766</td><td>1028.962</td><td>54.216</td><td>1011.778</td><td>17.527</td></tr>
+<tr><td>7</td><td>1251.257</td><td>581.656</td><td>606.610</td><td>611.257</td><td>608.597</td><td>610.150</td><td>2.274</td></tr>
+<tr><td>8</td><td>869.731</td><td>973.049</td><td>267.841</td><td>992.783</td><td>231.307</td><td>986.737</td><td>37.030</td></tr>
+</table><p>Forward RMSE: <strong>18.282 px</strong>. Largest error: point 8, 37.030 px. <a href="set_2_2_to_3/point_errors.csv">Download point errors</a>.</p>
+<a href="set_2_2_to_3/reprojection.png"><img class="reprojection" src="set_2_2_to_3/reprojection.png" alt="Manual targets and homography projections"></a>
+<h2>Reproduce and reuse</h2><pre>python a2_recover_homographies.py
+python -m unittest discover -s tests -v
+
+from homography import computeH
+H = computeH(im1_pts, im2_pts)</pre><p>For A.3, use H to map image1 into image2 coordinates. Inverse warping will use its inverse to sample image1. The current deliverables cover A.2 only; image warping and panorama blending are subsequent steps.</p></html>

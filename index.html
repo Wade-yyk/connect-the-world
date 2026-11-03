@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect the World · SYDE 671 Assignment 3</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/simple.css">
+  <script src="assets/results.js" defer></script>
+  <script src="assets/corners.js" defer></script>
+  <script src="assets/simple.js" defer></script>
+</head>
+<body>
+<header><div class="shell masthead"><a class="wordmark" href="#top">CONNECT<span>THE WORLD</span></a><div class="course">UNIVERSITY OF WATERLOO<span>SYDE 671 · Computational vision</span></div></div></header>
+<nav aria-label="Assignment sections"><div class="shell nav-inner"><a class="assignment" href="#top">ASSIGNMENT 03</a><div class="nav-links"><a href="#a1">A.1 Photos</a><a href="#a2">A.2 Homographies</a><a href="#a3">A.3</a><a href="#a4">A.4</a><a href="#part-b">Part B</a></div></div></nav>
+<main class="shell" id="top">
+  <div class="hero"><div class="eyebrow">[AUTO]STITCHING PHOTO MOSAICS</div><h1>Connect the <em>world.</em></h1></div>
+
+  <section id="a1">
+    <div class="section-heading"><span class="number">A.1</span><h2>Source Photos</h2></div>
+    <p>Two sets of overlapping photos: outdoor (4) and kitchen (3).</p>
+    <h3>Outdoor</h3><div class="photo-grid ">
+<figure><a href="photos/1/1.jpg" target="_blank" rel="noopener"><img src="photos/1/1.jpg" alt="Street and driveway with the edge of a parked truck" width="1280" height="1707" loading="lazy"></a><figcaption>Outdoor 1</figcaption></figure>
+<figure><a href="photos/1/2.jpg" target="_blank" rel="noopener"><img src="photos/1/2.jpg" alt="Parked truck and trees beside the street" width="1280" height="1707" loading="lazy"></a><figcaption>Outdoor 2</figcaption></figure>
+<figure><p class="photo-note">This is the link to the startup company. Welcome to visit!</p><a href="photos/1/3.jpg" target="_blank" rel="noopener"><img src="photos/1/3.jpg" alt="Parked truck in front of a house" width="1280" height="1707" loading="lazy"></a><figcaption>Outdoor 3</figcaption></figure>
+<figure><a href="photos/1/4.jpg" target="_blank" rel="noopener"><img src="photos/1/4.jpg" alt="House facade, garage, and driveway" width="1280" height="1707" loading="lazy"></a><figcaption>Outdoor 4</figcaption></figure>
+</div>
+<h3>Kitchen</h3><div class="photo-grid kitchen">
+<figure><a href="photos/2/1.jpg" target="_blank" rel="noopener"><img src="photos/2/1.jpg" alt="Kitchen view with refrigerator, cabinets, and stove" width="1280" height="1707" loading="lazy"></a><figcaption>Kitchen 1</figcaption></figure>
+<figure><a href="photos/2/2.jpg" target="_blank" rel="noopener"><img src="photos/2/2.jpg" alt="Kitchen view with stove, cabinets, and island" width="1280" height="1707" loading="lazy"></a><figcaption>Kitchen 2</figcaption></figure>
+<figure><a href="photos/2/3.jpg" target="_blank" rel="noopener"><img src="photos/2/3.jpg" alt="Kitchen view with countertop, cabinets, and doorway" width="1280" height="1707" loading="lazy"></a><figcaption>Kitchen 3</figcaption></figure>
+</div>
+  </section>
+
+  <section id="a2">
+    <div class="section-heading"><span class="number">A.2</span><h2>Recover Homographies</h2></div>
+    <p>I marked 8–9 corresponding points for each image pair and used least squares to calculate H. It maps the first image to the second.</p>
+    <label class="pair-label" for="pair-select">Image pair <select id="pair-select"><option value="set_1_1_to_2">Outdoor 1 → 2</option>
+<option value="set_1_2_to_3">Outdoor 2 → 3</option>
+<option value="set_1_3_to_4">Outdoor 3 → 4</option>
+<option value="set_2_1_to_2" selected>Kitchen 1 → 2</option>
+<option value="set_2_2_to_3">Kitchen 2 → 3</option></select></label>
+    <figure class="matches"><a id="matches-link" href="output/a2/set_2_1_to_2/correspondences.png" target="_blank" rel="noopener"><img id="matches-image" src="output/a2/set_2_1_to_2/correspondences.png" alt="Numbered corresponding points in the selected image pair"></a><figcaption id="pair-caption">Kitchen 1 → 2 · 8 point pairs. Click the image to enlarge.</figcaption></figure>
+    <h3>Recovered H</h3>
+    <p class="small">This is the H for the current image pair. Switch image pairs to see a different H.</p>
+    <pre id="matrix">[   1.301490e+00   2.017097e-02  -4.507249e+02 ]
+[   2.193282e-01   1.141861e+00  -1.284548e+02 ]
+[   2.741538e-04  -4.864324e-05   1.000000e+00 ]</pre>
+
+    <h3>System of equations</h3>
+    <p>Set h<sub>33</sub> = 1 to fix the scaling factor. For each (x, y) in the left picture and the corresponding (u, v) in the right picture, we can get the following equations:</p>
+    <div class="math-equations">
+      <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>u</mi><mo>=</mo><mfrac><mrow><msub><mi>h</mi><mn>11</mn></msub><mi>x</mi><mo>+</mo><msub><mi>h</mi><mn>12</mn></msub><mi>y</mi><mo>+</mo><msub><mi>h</mi><mn>13</mn></msub></mrow><mrow><msub><mi>h</mi><mn>31</mn></msub><mi>x</mi><mo>+</mo><msub><mi>h</mi><mn>32</mn></msub><mi>y</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mrow></math>
+      <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>v</mi><mo>=</mo><mfrac><mrow><msub><mi>h</mi><mn>21</mn></msub><mi>x</mi><mo>+</mo><msub><mi>h</mi><mn>22</mn></msub><mi>y</mi><mo>+</mo><msub><mi>h</mi><mn>23</mn></msub></mrow><mrow><msub><mi>h</mi><mn>31</mn></msub><mi>x</mi><mo>+</mo><msub><mi>h</mi><mn>32</mn></msub><mi>y</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mrow></math>
+    </div>
+    <p>Remove the denominators to get the following matrix:</p>
+    <pre>[ x  y  1  0  0  0  -ux  -uy ] h = u
+[ 0  0  0  x  y  1  -vx  -vy ] h = v
+h = [h11 h12 h13 h21 h22 h23 h31 h32]ᵀ</pre>
+    <p>Since hand-marked points are not 100% precise for mapping, we use least squares to find the solution that best fits these points overall.</p>
+    <details><summary>Numerical A h = b for the selected pair</summary><pre id="system">[         935.512         469.829               1               0               0               0       -585952.3       -294274.6         626.344 ]
+[               0               0               0         935.512         469.829               1       -464146.8       -233101.9         496.142 ]
+[         810.529          703.35               1               0               0               0       -422362.6       -366512.2         521.095 ]
+[               0               0               0         810.529          703.35               1       -583414.7       -506267.8         719.795 ]
+[        1024.315         963.182               1               0               0               0       -746011.7       -701488.3         728.303 ]
+[               0               0               0        1024.315         963.182               1       -989970.7       -930887.5         966.471 ]
+[          672.39         920.425               1               0               0               0       -259707.9       -355510.5         386.246 ]
+[               0               0               0          672.39         920.425               1       -632153.5       -865345.8         940.159 ]
+[         669.101         598.101               1               0               0               0       -251835.6       -225112.7         376.379 ]
+[               0               0               0         669.101         598.101               1       -404591.3       -361659.1         604.679 ]
+[         915.777         861.223               1               0               0               0       -576603.4       -542254.4         629.633 ]
+[               0               0               0         915.777         861.223               1       -794712.2       -747370.2         867.801 ]
+[        1037.471          802.02               1               0               0               0         -765831       -592027.9         738.171 ]
+[               0               0               0        1037.471          802.02               1       -852545.9       -659063.1         821.754 ]
+[          438.87         798.731               1               0               0               0       -55478.87         -100970         126.413 ]
+[               0               0               0          438.87         798.731               1       -357756.3       -651106.3         815.176 ]</pre><a id="system-link" href="output/a2/set_2_1_to_2/linear_system.csv" download>Download equations (CSV)</a></details>
+
+    <h3>Core code</h3>
+    <pre><code>def computeH(im1_pts, im2_pts):
+    A, b = build_linear_system(im1_pts, im2_pts)
+    scales = np.linalg.norm(A, axis=0)
+    scales[scales == 0] = 1.0
+    z, _, rank, _ = np.linalg.lstsq(A / scales, b, rcond=None)
+    h = z / scales
+    return np.append(h, 1.0).reshape(3, 3)</code></pre>
+    <p class="small"><a href="homography.py">Full source</a> · <a id="matrix-link" href="output/a2/set_2_1_to_2/homography.json" download>H and point errors</a></p>
+
+    <h3>Results</h3>
+    <div class="table-wrap"><table><thead><tr><th>Pair</th><th>Points</th><th>RMSE (px)</th><th>Max error (px)</th></tr></thead><tbody><tr><td>Outdoor 1 → 2</td><td>8</td><td>12.37</td><td>20.60</td></tr>
+<tr><td>Outdoor 2 → 3</td><td>8</td><td>7.28</td><td>10.32</td></tr>
+<tr><td>Outdoor 3 → 4</td><td>9</td><td>8.04</td><td>13.60</td></tr>
+<tr><td>Kitchen 1 → 2</td><td>8</td><td>4.19</td><td>7.44</td></tr>
+<tr><td>Kitchen 2 → 3</td><td>8</td><td>18.28</td><td>37.03</td></tr></tbody></table></div>
+    <p class="small">Errors are measured on the marked points at the original resolution. Kitchen 2 → 3 has the largest error; point 8 should be checked.</p>
+  </section>
+
+  <section id="a3"><div class="section-heading"><span class="number">A.3</span><h2>Image Warping</h2></div><p>I select four corners of a rectangular object and use computeH() to map them to a rectangle. For each output pixel, I use H⁻¹ to find its position in the original image.</p>
+<h3>Window</h3><div class="rectification-grid">
+<figure><a href="output/a3/window/source_crop.png" target="_blank" rel="noopener"><img src="output/a3/window/source_crop.png" alt="Window: Original crop · selected corners" loading="lazy"></a><figcaption>Original crop · selected corners</figcaption></figure>
+<figure><a href="output/a3/window/nearest.png" target="_blank" rel="noopener"><img src="output/a3/window/nearest.png" alt="Window: Nearest neighbor" loading="lazy"></a><figcaption>Nearest neighbor</figcaption></figure>
+<figure><a href="output/a3/window/bilinear.png" target="_blank" rel="noopener"><img src="output/a3/window/bilinear.png" alt="Window: Bilinear" loading="lazy"></a><figcaption>Bilinear</figcaption></figure>
+</div>
+<p class="small">Full photo: <a href="photos/1/4.jpg" target="_blank" rel="noopener">original</a> · <a href="output/a3/window/source_points.png" target="_blank" rel="noopener">marked corners</a>. 4× pixel detail: <a href="output/a3/window/detail_nearest.png" target="_blank" rel="noopener">nearest</a> / <a href="output/a3/window/detail_bilinear.png" target="_blank" rel="noopener">bilinear</a>. <a href="output/a3/window/rectification.json">H and coordinates</a>.</p>
+<h3>Kitchen cabinets</h3><div class="rectification-grid">
+<figure><a href="output/a3/cabinet/source_crop.png" target="_blank" rel="noopener"><img src="output/a3/cabinet/source_crop.png" alt="Kitchen cabinets: Original crop · selected corners" loading="lazy"></a><figcaption>Original crop · selected corners</figcaption></figure>
+<figure><a href="output/a3/cabinet/nearest.png" target="_blank" rel="noopener"><img src="output/a3/cabinet/nearest.png" alt="Kitchen cabinets: Nearest neighbor" loading="lazy"></a><figcaption>Nearest neighbor</figcaption></figure>
+<figure><a href="output/a3/cabinet/bilinear.png" target="_blank" rel="noopener"><img src="output/a3/cabinet/bilinear.png" alt="Kitchen cabinets: Bilinear" loading="lazy"></a><figcaption>Bilinear</figcaption></figure>
+</div>
+<p class="small">Full photo: <a href="photos/2/3.jpg" target="_blank" rel="noopener">original</a> · <a href="output/a3/cabinet/source_points.png" target="_blank" rel="noopener">marked corners</a>. 4× pixel detail: <a href="output/a3/cabinet/detail_nearest.png" target="_blank" rel="noopener">nearest</a> / <a href="output/a3/cabinet/detail_bilinear.png" target="_blank" rel="noopener">bilinear</a>. <a href="output/a3/cabinet/rectification.json">H and coordinates</a>.</p>
+<p>Suppose the position found in the original image is (100.1, 50.9). For nearest-neighbor interpolation, we choose the nearest pixel, (100, 51). For bilinear interpolation, we use the four surrounding pixels to calculate a weighted value:</p>
+<div class="math-equations">
+  <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>dx</mi><mo>=</mo><mn>100.1</mn><mo>−</mo><mn>100</mn><mo>=</mo><mn>0.1</mn><mo>,</mo><mspace width="1em"/><mi>dy</mi><mo>=</mo><mn>50.9</mn><mo>−</mo><mn>50</mn><mo>=</mo><mn>0.9</mn></mrow></math>
+  <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable columnalign="left"><mtr><mtd><mrow><mi>C</mi><mo>=</mo><mn>0.09</mn><mi>I</mi><mo>(</mo><mn>100</mn><mo>,</mo><mn>50</mn><mo>)</mo><mo>+</mo><mn>0.01</mn><mi>I</mi><mo>(</mo><mn>101</mn><mo>,</mo><mn>50</mn><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mrow><mspace width="2em"/><mo>+</mo><mn>0.81</mn><mi>I</mi><mo>(</mo><mn>100</mn><mo>,</mo><mn>51</mn><mo>)</mo><mo>+</mo><mn>0.09</mn><mi>I</mi><mo>(</mo><mn>101</mn><mo>,</mo><mn>51</mn><mo>)</mo></mrow></mtd></mtr></mtable></math>
+</div>
+<p class="small">I(x, y) is the color at pixel (x, y). The four weights are (1 − dx)(1 − dy), dx(1 − dy), (1 − dx)dy, and dxdy.</p>
+<p class="small">The target rectangle proportions are chosen for display; the physical dimensions were not measured. The original crops show the selected corners. Click any image to enlarge it.</p>
+<h3>Core interpolation</h3>
+<pre><code>x0, y0 = np.floor(x).astype(int), np.floor(y).astype(int)
+x1, y1 = np.minimum(x0 + 1, width - 1), np.minimum(y0 + 1, height - 1)
+dx, dy = x - x0, y - y0
+nearest = im[np.floor(y + 0.5).astype(int), np.floor(x + 0.5).astype(int)]
+bilinear = ((1-dx)*(1-dy)*im[y0, x0]
+          + dx*(1-dy)*im[y0, x1]
+          + (1-dx)*dy*im[y1, x0]
+          + dx*dy*im[y1, x1])</code></pre>
+<p class="small">Pixels outside the source image are marked invalid in a separate mask. <a href="warping.py">Full source</a> · <a href="correspondences/rectification/points.json">Selected corners</a></p>
+<h3>Speed &amp; quality</h3>
+<div class="table-wrap"><table><thead><tr><th>Example</th><th>Output (W × H)</th><th>Nearest / ms</th><th>Bilinear / ms</th></tr></thead><tbody><tr><td>Window</td><td>360 × 640</td><td>7.960</td><td>31.596</td></tr>
+<tr><td>Kitchen cabinets</td><td>840 × 400</td><td>11.638</td><td>44.146</td></tr></tbody></table></div>
+<p class="small">Median of 7 runs after one warm-up per method; image I/O and H estimation are excluded. Both methods use the same output canvas. <a href="output/a3/timings.csv">Timing data</a></p>
+<p>Nearest neighbor copies one pixel and produces visible pixel steps when enlarged. Bilinear uses four pixels, making edges smoother but softer. The table shows the measured speed difference.</p>
+</section>
+  <section id="a4"><div class="section-heading"><span class="number">A.4</span><h2>Mosaics</h2></div><p>I reuse the manually marked points from A.2 and warp the images into one reference view using bilinear interpolation. I project all image corners to find a shared canvas, then blend the overlapping pixels with feather weights.</p>
+<h3>Outdoor 1 + 2</h3><div class="mosaic-sources">
+<figure><a href="photos/1/1.jpg" target="_blank" rel="noopener"><img src="photos/1/1.jpg" alt="Source: Outdoor 1" loading="lazy"></a><figcaption>Outdoor 1</figcaption></figure>
+<figure><a href="photos/1/2.jpg" target="_blank" rel="noopener"><img src="photos/1/2.jpg" alt="Source: Outdoor 2" loading="lazy"></a><figcaption>Outdoor 2</figcaption></figure>
+</div><div class="mosaic-results">
+<figure><a href="output/a4/outdoor_1_2/overwrite.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_1_2/overwrite.png" alt="Outdoor 1 + 2: Before · overwrite" loading="lazy"></a><figcaption>Before · overwrite</figcaption></figure>
+<figure><a href="output/a4/outdoor_1_2/mosaic.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_1_2/mosaic.png" alt="Outdoor 1 + 2: After · weighted blending" loading="lazy"></a><figcaption>After · weighted blending</figcaption></figure>
+</div>
+<p class="small">Reference: image 2. <a href="output/a4/outdoor_1_2/mosaic.png" download>Full-resolution mosaic</a> · <a href="output/a4/outdoor_1_2/mosaic.json">H matrices and canvas</a> · <a href="#crop-outdoor_1_2">Cropped version ↓</a></p>
+<div class="mosaic-results mosaic-cropped pyramid-comparison" id="crop-outdoor_1_2">
+<figure><a href="output/a4/outdoor_1_2/cropped.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_1_2/cropped.png" alt="Outdoor 1 + 2: Feathering · cropped" width="1847" height="1707" loading="lazy"></a><figcaption>Feathering · cropped · <a href="output/a4/outdoor_1_2/cropped.png" download>Download</a></figcaption></figure>
+<figure><a href="output/a4/outdoor_1_2/laplacian_cropped.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_1_2/laplacian_cropped.png" alt="Outdoor 1 + 2: Laplacian pyramid · 6 levels · cropped" width="1847" height="1707" loading="lazy"></a><figcaption>Laplacian pyramid · 6 levels · cropped · <a href="output/a4/outdoor_1_2/laplacian_cropped.png" download>Download</a></figcaption></figure>
+</div>
+<p class="small">Same H, canvas, and 1847 × 1707 crop. <a href="output/a4/outdoor_1_2/laplacian.png" target="_blank" rel="noopener">Full Laplacian mosaic</a>.</p>
+<details><summary>Close-up comparison</summary><div class="mosaic-results">
+<figure><a href="output/a4/outdoor_1_2/feather_detail.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_1_2/feather_detail.png" alt="Outdoor 1 + 2: Feathering · detail" loading="lazy"></a><figcaption>Feathering · detail</figcaption></figure>
+<figure><a href="output/a4/outdoor_1_2/laplacian_detail.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_1_2/laplacian_detail.png" alt="Outdoor 1 + 2: Laplacian pyramid · same detail" loading="lazy"></a><figcaption>Laplacian pyramid · same detail</figcaption></figure>
+</div></details>
+<h3>Outdoor 3 + 4</h3><div class="mosaic-sources">
+<figure><a href="photos/1/3.jpg" target="_blank" rel="noopener"><img src="photos/1/3.jpg" alt="Source: Outdoor 3" loading="lazy"></a><figcaption>Outdoor 3</figcaption></figure>
+<figure><a href="photos/1/4.jpg" target="_blank" rel="noopener"><img src="photos/1/4.jpg" alt="Source: Outdoor 4" loading="lazy"></a><figcaption>Outdoor 4</figcaption></figure>
+</div><div class="mosaic-results">
+<figure><a href="output/a4/outdoor_3_4/overwrite.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_3_4/overwrite.png" alt="Outdoor 3 + 4: Before · overwrite" loading="lazy"></a><figcaption>Before · overwrite</figcaption></figure>
+<figure><a href="output/a4/outdoor_3_4/mosaic.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_3_4/mosaic.png" alt="Outdoor 3 + 4: After · weighted blending" loading="lazy"></a><figcaption>After · weighted blending</figcaption></figure>
+</div>
+<p class="small">Reference: image 4. <a href="output/a4/outdoor_3_4/mosaic.png" download>Full-resolution mosaic</a> · <a href="output/a4/outdoor_3_4/mosaic.json">H matrices and canvas</a> · <a href="#crop-outdoor_3_4">Cropped version ↓</a></p>
+<div class="mosaic-results mosaic-cropped pyramid-comparison" id="crop-outdoor_3_4">
+<figure><a href="output/a4/outdoor_3_4/cropped.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_3_4/cropped.png" alt="Outdoor 3 + 4: Feathering · cropped" width="2858" height="1707" loading="lazy"></a><figcaption>Feathering · cropped · <a href="output/a4/outdoor_3_4/cropped.png" download>Download</a></figcaption></figure>
+<figure><a href="output/a4/outdoor_3_4/laplacian_cropped.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_3_4/laplacian_cropped.png" alt="Outdoor 3 + 4: Laplacian pyramid · 6 levels · cropped" width="2858" height="1707" loading="lazy"></a><figcaption>Laplacian pyramid · 6 levels · cropped · <a href="output/a4/outdoor_3_4/laplacian_cropped.png" download>Download</a></figcaption></figure>
+</div>
+<p class="small">Same H, canvas, and 2858 × 1707 crop. <a href="output/a4/outdoor_3_4/laplacian.png" target="_blank" rel="noopener">Full Laplacian mosaic</a>.</p>
+<details><summary>Close-up comparison</summary><div class="mosaic-results">
+<figure><a href="output/a4/outdoor_3_4/feather_detail.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_3_4/feather_detail.png" alt="Outdoor 3 + 4: Feathering · detail" loading="lazy"></a><figcaption>Feathering · detail</figcaption></figure>
+<figure><a href="output/a4/outdoor_3_4/laplacian_detail.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_3_4/laplacian_detail.png" alt="Outdoor 3 + 4: Laplacian pyramid · same detail" loading="lazy"></a><figcaption>Laplacian pyramid · same detail</figcaption></figure>
+</div></details>
+<h3>Kitchen 1 + 2 + 3</h3><div class="mosaic-sources">
+<figure><a href="photos/2/1.jpg" target="_blank" rel="noopener"><img src="photos/2/1.jpg" alt="Source: Kitchen 1" loading="lazy"></a><figcaption>Kitchen 1</figcaption></figure>
+<figure><a href="photos/2/2.jpg" target="_blank" rel="noopener"><img src="photos/2/2.jpg" alt="Source: Kitchen 2" loading="lazy"></a><figcaption>Kitchen 2</figcaption></figure>
+<figure><a href="photos/2/3.jpg" target="_blank" rel="noopener"><img src="photos/2/3.jpg" alt="Source: Kitchen 3" loading="lazy"></a><figcaption>Kitchen 3</figcaption></figure>
+</div><div class="mosaic-results">
+<figure><a href="output/a4/kitchen_1_2_3/overwrite.png" target="_blank" rel="noopener"><img src="output/a4/kitchen_1_2_3/overwrite.png" alt="Kitchen 1 + 2 + 3: Before · overwrite" loading="lazy"></a><figcaption>Before · overwrite</figcaption></figure>
+<figure><a href="output/a4/kitchen_1_2_3/mosaic.png" target="_blank" rel="noopener"><img src="output/a4/kitchen_1_2_3/mosaic.png" alt="Kitchen 1 + 2 + 3: After · weighted blending" loading="lazy"></a><figcaption>After · weighted blending</figcaption></figure>
+</div>
+<p class="small">Reference: image 2. <a href="output/a4/kitchen_1_2_3/mosaic.png" download>Full-resolution mosaic</a> · <a href="output/a4/kitchen_1_2_3/mosaic.json">H matrices and canvas</a> · <a href="#crop-kitchen_1_2_3">Cropped version ↓</a></p>
+<div class="mosaic-results mosaic-cropped pyramid-comparison" id="crop-kitchen_1_2_3">
+<figure><a href="output/a4/kitchen_1_2_3/cropped.png" target="_blank" rel="noopener"><img src="output/a4/kitchen_1_2_3/cropped.png" alt="Kitchen 1 + 2 + 3: Feathering · cropped" width="2495" height="1682" loading="lazy"></a><figcaption>Feathering · cropped · <a href="output/a4/kitchen_1_2_3/cropped.png" download>Download</a></figcaption></figure>
+<figure><a href="output/a4/kitchen_1_2_3/laplacian_cropped.png" target="_blank" rel="noopener"><img src="output/a4/kitchen_1_2_3/laplacian_cropped.png" alt="Kitchen 1 + 2 + 3: Laplacian pyramid · 6 levels · cropped" width="2495" height="1682" loading="lazy"></a><figcaption>Laplacian pyramid · 6 levels · cropped · <a href="output/a4/kitchen_1_2_3/laplacian_cropped.png" download>Download</a></figcaption></figure>
+</div>
+<p class="small">Same H, canvas, and 2495 × 1682 crop. <a href="output/a4/kitchen_1_2_3/laplacian.png" target="_blank" rel="noopener">Full Laplacian mosaic</a>.</p>
+<details><summary>Close-up comparison</summary><div class="mosaic-results">
+<figure><a href="output/a4/kitchen_1_2_3/feather_detail.png" target="_blank" rel="noopener"><img src="output/a4/kitchen_1_2_3/feather_detail.png" alt="Kitchen 1 + 2 + 3: Feathering · detail" loading="lazy"></a><figcaption>Feathering · detail</figcaption></figure>
+<figure><a href="output/a4/kitchen_1_2_3/laplacian_detail.png" target="_blank" rel="noopener"><img src="output/a4/kitchen_1_2_3/laplacian_detail.png" alt="Kitchen 1 + 2 + 3: Laplacian pyramid · same detail" loading="lazy"></a><figcaption>Laplacian pyramid · same detail</figcaption></figure>
+</div></details>
+<h3>Laplacian pyramid comparison</h3>
+<p>I also try a six-level Laplacian pyramid. I select the image with the largest feather weight at each pixel, then build Gaussian pyramids of these selection masks and Laplacian pyramids of the images. I blend each level and reconstruct the result. The finest level selects details from one image, while coarser levels blend across a wider region. Both methods use the same H matrices, bilinear warping, canvas, and crop.</p>
+<p class="small">The pyramid filters, downsampling, upsampling, and reconstruction are implemented in NumPy. No exposure correction or new alignment is applied. <a href="pyramid_blending.py">Pyramid source</a> · <a href="https://persci.mit.edu/pub_pdfs/spline83.pdf" target="_blank" rel="noopener">Burt &amp; Adelson, 1983</a></p>
+<p>The kitchen bottles and countertop details show less ghosting with the pyramid blend. Misaligned edges can still break at the selection boundary, and the outdoor brightness difference remains visible. The change improves some local details but does not fix the original alignment.</p>
+<h3>Weighted blending</h3>
+<p>Each source image has larger weights near its center and smaller weights near its edges. I warp the weights with the image and calculate:</p>
+<div class="math-equations"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>C</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><msub><mi>I</mi><mi>i</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo></mrow></mfrac></mrow></math></div>
+<p class="small">I<sub>i</sub> and w<sub>i</sub> are the warped color and weight of image i. Source weights use the distance to the nearest border, normalized to 1 at the center. A one-pixel floor keeps border pixels valid. Outside each image, the weight is 0; uncovered canvas pixels are transparent.</p>
+<h3>Core code</h3>
+<pre><code>for source, H in zip(sources, homographies):
+    source_with_alpha = np.dstack((source.astype(np.float32), feather_weights(source.shape)))
+    warped, valid = warpImageBilinear(source_with_alpha, H, (height, width),
+                                     origin=origin, return_mask=True)
+    weight = np.where(valid, warped[..., 3], 0)
+    color_sum += warped[..., :3] * weight[..., None]
+    weight_sum += weight
+
+np.divide(color_sum, weight_sum[..., None], out=color_sum,
+          where=weight_sum[..., None] &gt; 0)</code></pre>
+<p class="small"><a href="mosaicing.py">Blending source</a> · <a href="a4_mosaics.py">Generation script</a> · <a href="output/a4/summary.csv">Result data</a></p>
+<div class="table-wrap"><table><thead><tr><th>Mosaic</th><th>Images</th><th>Output (W × H)</th><th>Overlap*</th></tr></thead><tbody><tr><td>Outdoor 1 + 2</td><td>2</td><td>2075 × 2261</td><td>35.9%</td></tr>
+<tr><td>Outdoor 3 + 4</td><td>2</td><td>2973 × 2752</td><td>9.5%</td></tr>
+<tr><td>Kitchen 1 + 2 + 3</td><td>3</td><td>2594 × 2228</td><td>44.0%</td></tr></tbody></table></div>
+<p class="small">*Pixels covered by at least two images, as a percentage of all valid mosaic pixels. These are three mosaics from two scenes: two outdoor pairs and one kitchen sequence.</p>
+<p><strong>Procedure:</strong> First, I choose Outdoor 1 and Outdoor 2, Outdoor 3 and Outdoor 4, and Kitchen 1, 2, and 3 to create three mosaics. I read the corresponding points marked in A.2 and use the H matrices computed from them. For the first set, I project Outdoor 1 into the view of Outdoor 2. For the second set, I project Outdoor 3 into the view of Outdoor 4. For the third set, I align all images to the view of Kitchen 2. Kitchen 1 uses H<sub>1→2</sub>, and Kitchen 3 uses H<sub>3→2</sub> = H<sub>2→3</sub><sup>−1</sup>. I apply the respective homography matrix H to the four corners of each photograph, then determine the minimum and maximum coordinates among all these corner points. If any coordinates are negative, I apply a global translation to shift everything into the canvas area. These ranges define the width and height of the final canvas. Then, using the method in A.3, I use H<sup>−1</sup> for each pixel in the canvas to find its position in the original image and calculate its color using bilinear interpolation. Next, I use feathering: the weight increases toward the center of each photo and decreases toward its edges. Finally, I calculate a weighted average in the overlapping regions.</p>
+<p>Feathering makes the image boundaries less abrupt than overwriting. It cannot correct misalignment, since hand marking is not 100% precise, especially in the kitchen, where the colors are more varied. Also, when blending Outdoor 3 and 4, I noticed a difference in brightness. This might be due to changes in backlighting as I rotated the camera and automatic adjustments made by the phone camera when taking the photos.</p>
+<p>Then I tried Laplacian pyramid blending. An image is selected based on the original feathering weights to preserve its set of outlines. The selected image regions are blended gradually across the coarser levels of the image pyramid, keeping the transitions between them natural. This resolved some of the ghosting problems, although some misalignment remains.</p>
+</section>
+  <section id="part-b">
+    <div class="section-heading"><span class="number">B</span><h2>Automatic Stitching</h2></div>
+    <p class="small"><a href="#b1">B.1 Corners</a> · <a href="#b2">B.2 Descriptors</a> · <a href="#b3">B.3 Matches</a> · <a href="#b4">B.4 RANSAC</a></p>
+    <div id="b1"><h3>B.1 Harris Corner Detection &amp; ANMS</h3><p>I detect Harris corners at a single scale, then implement ANMS to select up to 500 points. I compare the strongest Harris points with the same number of ANMS points. All coordinates use the original image resolution, without subpixel refinement.</p>
+<label class="pair-label" for="corner-select">Image <select id="corner-select"><option value="set_1_1">Outdoor 1</option>
+<option value="set_1_2">Outdoor 2</option>
+<option value="set_1_3">Outdoor 3</option>
+<option value="set_1_4">Outdoor 4</option>
+<option value="set_2_1">Kitchen 1</option>
+<option value="set_2_2" selected>Kitchen 2</option>
+<option value="set_2_3">Kitchen 3</option></select></label>
+<div class="mosaic-results corner-results">
+  <figure><a id="harris-top-link" href="output/b1/set_2_2/harris_top.jpg" target="_blank" rel="noopener"><img id="harris-top-image" src="output/b1/set_2_2/harris_top.jpg" width="1280" height="1707" alt="Strongest Harris corners without ANMS"></a><figcaption id="harris-top-caption">Kitchen 2 · strongest 500 Harris corners · no ANMS</figcaption></figure>
+  <figure><a id="anms-link" href="output/b1/set_2_2/anms.jpg" target="_blank" rel="noopener"><img id="anms-image" src="output/b1/set_2_2/anms.jpg" width="1280" height="1707" alt="Corners selected using ANMS"></a><figcaption id="anms-caption">Kitchen 2 · ANMS 500 corners</figcaption></figure>
+</div>
+<details><summary>All detected Harris candidates</summary><figure class="all-corners"><a id="harris-all-link" href="output/b1/set_2_2/harris_all.jpg" target="_blank" rel="noopener"><img id="harris-all-image" src="output/b1/set_2_2/harris_all.jpg" width="1280" height="1707" alt="All detected Harris candidates before count selection" loading="lazy"></a><figcaption id="harris-all-caption">Kitchen 2 · all 10637 Harris candidates</figcaption></figure></details>
+<p class="small"><a id="corner-csv-link" href="output/b1/set_2_2/corners.csv" download>All coordinates (CSV)</a> · <a id="corner-record-link" href="output/b1/set_2_2/corners.json">Selected points (JSON)</a> · <a id="corner-npz-link" href="output/b1/set_2_2/features.npz" download>Features (NPZ)</a></p>
+<h3>Method</h3>
+<p>I smooth the grayscale image, calculate its gradients, and form the Harris matrix M from the smoothed gradient products. If the image intensity changes significantly in two directions at a position, it might be a corner. I calculate its score based on <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2005/06/cvpr05.pdf#page=2" target="_blank" rel="noopener">Brown et al., <em>Multi-Image Matching using Multi-Scale Oriented Patches</em>, Section 2</a>. I use f = det(M) / trace(M) as the corner strength and keep positive 3 × 3 local maxima above 0.5% of the peak response.</p>
+<pre>r_i = min_j ||p_i − p_j||, subject to f_i &lt; 0.9 f_j
+Keep the 500 points with the largest r_i.</pre>
+<p>A candidate gets a large radius when there is no significantly stronger point nearby. ANMS favors these points, spreading the selection across textured areas. If no sufficiently stronger point exists, the radius is infinite.</p>
+<h3>Core ANMS code</h3>
+<pre><code>dx = points[start:stop, 0, None] - points[None, :, 0]
+dy = points[start:stop, 1, None] - points[None, :, 1]
+distance_squared = dx*dx + dy*dy
+stronger = strengths[start:stop, None] &lt; c_robust*strengths[None, :]
+distance_squared[~stronger] = np.inf
+radii[start:stop] = np.sqrt(distance_squared.min(axis=1))</code></pre>
+<p class="small">σ<sub>d</sub> = 1.0, σ<sub>i</sub> = 1.5; c<sub>robust</sub> = 0.9. A 20-pixel border is excluded to leave room for the later 40 × 40 descriptors. <a href="corners.py">Harris and ANMS source</a> · <a href="b1_detect_corners.py">Generation script</a> · <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2005/06/cvpr05.pdf" target="_blank" rel="noopener">Brown et al., sections 2–3</a></p>
+<p>I observed that without ANMS, the selected points tended to concentrate in areas with rich texture. With ANMS, the points were more spread out across the image.</p>
+<div class="table-wrap"><table><thead><tr><th>Image</th><th>Candidates</th><th>Kept</th><th>Top Harris cells*</th><th>ANMS cells*</th></tr></thead><tbody><tr><td>Outdoor 1</td><td>17360</td><td>500</td><td>14</td><td>44</td></tr>
+<tr><td>Outdoor 2</td><td>18622</td><td>500</td><td>16</td><td>42</td></tr>
+<tr><td>Outdoor 3</td><td>18568</td><td>500</td><td>32</td><td>44</td></tr>
+<tr><td>Outdoor 4</td><td>19577</td><td>500</td><td>41</td><td>48</td></tr>
+<tr><td>Kitchen 1</td><td>9880</td><td>500</td><td>29</td><td>48</td></tr>
+<tr><td>Kitchen 2</td><td>10637</td><td>500</td><td>26</td><td>48</td></tr>
+<tr><td>Kitchen 3</td><td>7101</td><td>500</td><td>25</td><td>44</td></tr></tbody></table></div>
+<p class="small">*Occupied cells in an 8 × 6 grid (48 cells). Both selections contain the same number of points. ANMS improves spatial coverage, but smooth regions such as the sky still have few corners. <a href="output/b1/summary.csv">Result data</a></p>
+</div>
+    <div id="b2" class="b-subsection"><h3>B.2 Feature Descriptor Extraction</h3><p>I use the ANMS points from B.1. For each point, I smooth the grayscale image and sample its 40 × 40 window into an axis-aligned 8 × 8 patch. I normalize the 64 values to have a mean of 0 and a standard deviation of 1.</p>
+<label class="pair-label" for="descriptor-select">Image <select id="descriptor-select"><option value="set_1_1">Outdoor 1</option>
+<option value="set_1_2">Outdoor 2</option>
+<option value="set_1_3">Outdoor 3</option>
+<option value="set_1_4">Outdoor 4</option>
+<option value="set_2_1">Kitchen 1</option>
+<option value="set_2_2" selected>Kitchen 2</option>
+<option value="set_2_3">Kitchen 3</option></select></label>
+<div class="descriptor-panel" data-descriptor-image="set_1_1" hidden><div class="descriptor-layout">
+<figure class="descriptor-context"><a href="output/b2/set_1_1/examples.jpg" target="_blank" rel="noopener"><img src="output/b2/set_1_1/examples.jpg" alt="Outdoor 1: numbered descriptor windows" width="1280" height="1707" loading="lazy"></a><figcaption>Outdoor 1 · selected 40 × 40 windows</figcaption></figure><div class="descriptor-grid">
+<div class="descriptor-card"><p class="patch-label"><strong>1</strong> (1113, 576)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_1/patch_1_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_1_40.png" width="40" height="40" alt="Outdoor 1, point 1: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_1/patch_1_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_1_8.png" width="8" height="8" alt="Outdoor 1, point 1: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>2</strong> (1228, 399)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_1/patch_2_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_2_40.png" width="40" height="40" alt="Outdoor 1, point 2: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_1/patch_2_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_2_8.png" width="8" height="8" alt="Outdoor 1, point 2: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>3</strong> (772, 668)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_1/patch_3_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_3_40.png" width="40" height="40" alt="Outdoor 1, point 3: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_1/patch_3_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_3_8.png" width="8" height="8" alt="Outdoor 1, point 3: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>4</strong> (491, 720)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_1/patch_4_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_4_40.png" width="40" height="40" alt="Outdoor 1, point 4: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_1/patch_4_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_4_8.png" width="8" height="8" alt="Outdoor 1, point 4: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>5</strong> (1248, 141)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_1/patch_5_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_5_40.png" width="40" height="40" alt="Outdoor 1, point 5: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_1/patch_5_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_5_8.png" width="8" height="8" alt="Outdoor 1, point 5: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>6</strong> (119, 488)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_1/patch_6_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_6_40.png" width="40" height="40" alt="Outdoor 1, point 6: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_1/patch_6_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_1/patch_6_8.png" width="8" height="8" alt="Outdoor 1, point 6: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+</div></div>
+<p class="small"><a href="output/b2/set_1_1/descriptors.npz" download>All descriptors (NPZ)</a> · <a href="output/b2/set_1_1/descriptors.csv" download>64-value vectors (CSV)</a> · <a href="output/b2/set_1_1/descriptors.json">Example coordinates</a></p></div>
+<div class="descriptor-panel" data-descriptor-image="set_1_2" hidden><div class="descriptor-layout">
+<figure class="descriptor-context"><a href="output/b2/set_1_2/examples.jpg" target="_blank" rel="noopener"><img src="output/b2/set_1_2/examples.jpg" alt="Outdoor 2: numbered descriptor windows" width="1280" height="1707" loading="lazy"></a><figcaption>Outdoor 2 · selected 40 × 40 windows</figcaption></figure><div class="descriptor-grid">
+<div class="descriptor-card"><p class="patch-label"><strong>1</strong> (627, 667)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_2/patch_1_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_1_40.png" width="40" height="40" alt="Outdoor 2, point 1: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_2/patch_1_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_1_8.png" width="8" height="8" alt="Outdoor 2, point 1: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>2</strong> (762, 454)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_2/patch_2_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_2_40.png" width="40" height="40" alt="Outdoor 2, point 2: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_2/patch_2_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_2_8.png" width="8" height="8" alt="Outdoor 2, point 2: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>3</strong> (1001, 501)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_2/patch_3_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_3_40.png" width="40" height="40" alt="Outdoor 2, point 3: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_2/patch_3_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_3_8.png" width="8" height="8" alt="Outdoor 2, point 3: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>4</strong> (412, 715)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_2/patch_4_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_4_40.png" width="40" height="40" alt="Outdoor 2, point 4: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_2/patch_4_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_4_8.png" width="8" height="8" alt="Outdoor 2, point 4: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>5</strong> (36, 702)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_2/patch_5_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_5_40.png" width="40" height="40" alt="Outdoor 2, point 5: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_2/patch_5_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_5_8.png" width="8" height="8" alt="Outdoor 2, point 5: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>6</strong> (787, 214)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_2/patch_6_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_6_40.png" width="40" height="40" alt="Outdoor 2, point 6: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_2/patch_6_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_2/patch_6_8.png" width="8" height="8" alt="Outdoor 2, point 6: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+</div></div>
+<p class="small"><a href="output/b2/set_1_2/descriptors.npz" download>All descriptors (NPZ)</a> · <a href="output/b2/set_1_2/descriptors.csv" download>64-value vectors (CSV)</a> · <a href="output/b2/set_1_2/descriptors.json">Example coordinates</a></p></div>
+<div class="descriptor-panel" data-descriptor-image="set_1_3" hidden><div class="descriptor-layout">
+<figure class="descriptor-context"><a href="output/b2/set_1_3/examples.jpg" target="_blank" rel="noopener"><img src="output/b2/set_1_3/examples.jpg" alt="Outdoor 3: numbered descriptor windows" width="1280" height="1707" loading="lazy"></a><figcaption>Outdoor 3 · selected 40 × 40 windows</figcaption></figure><div class="descriptor-grid">
+<div class="descriptor-card"><p class="patch-label"><strong>1</strong> (305, 442)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_3/patch_1_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_1_40.png" width="40" height="40" alt="Outdoor 3, point 1: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_3/patch_1_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_1_8.png" width="8" height="8" alt="Outdoor 3, point 1: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>2</strong> (520, 526)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_3/patch_2_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_2_40.png" width="40" height="40" alt="Outdoor 3, point 2: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_3/patch_2_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_2_8.png" width="8" height="8" alt="Outdoor 3, point 2: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>3</strong> (155, 658)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_3/patch_3_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_3_40.png" width="40" height="40" alt="Outdoor 3, point 3: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_3/patch_3_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_3_8.png" width="8" height="8" alt="Outdoor 3, point 3: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>4</strong> (282, 159)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_3/patch_4_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_4_40.png" width="40" height="40" alt="Outdoor 3, point 4: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_3/patch_4_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_4_8.png" width="8" height="8" alt="Outdoor 3, point 4: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>5</strong> (1014, 1446)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_3/patch_5_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_5_40.png" width="40" height="40" alt="Outdoor 3, point 5: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_3/patch_5_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_5_8.png" width="8" height="8" alt="Outdoor 3, point 5: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>6</strong> (1232, 1552)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_3/patch_6_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_6_40.png" width="40" height="40" alt="Outdoor 3, point 6: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_3/patch_6_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_3/patch_6_8.png" width="8" height="8" alt="Outdoor 3, point 6: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+</div></div>
+<p class="small"><a href="output/b2/set_1_3/descriptors.npz" download>All descriptors (NPZ)</a> · <a href="output/b2/set_1_3/descriptors.csv" download>64-value vectors (CSV)</a> · <a href="output/b2/set_1_3/descriptors.json">Example coordinates</a></p></div>
+<div class="descriptor-panel" data-descriptor-image="set_1_4" hidden><div class="descriptor-layout">
+<figure class="descriptor-context"><a href="output/b2/set_1_4/examples.jpg" target="_blank" rel="noopener"><img src="output/b2/set_1_4/examples.jpg" alt="Outdoor 4: numbered descriptor windows" width="1280" height="1707" loading="lazy"></a><figcaption>Outdoor 4 · selected 40 × 40 windows</figcaption></figure><div class="descriptor-grid">
+<div class="descriptor-card"><p class="patch-label"><strong>1</strong> (434, 943)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_4/patch_1_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_1_40.png" width="40" height="40" alt="Outdoor 4, point 1: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_4/patch_1_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_1_8.png" width="8" height="8" alt="Outdoor 4, point 1: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>2</strong> (308, 1262)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_4/patch_2_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_2_40.png" width="40" height="40" alt="Outdoor 4, point 2: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_4/patch_2_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_2_8.png" width="8" height="8" alt="Outdoor 4, point 2: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>3</strong> (363, 1538)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_4/patch_3_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_3_40.png" width="40" height="40" alt="Outdoor 4, point 3: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_4/patch_3_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_3_8.png" width="8" height="8" alt="Outdoor 4, point 3: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>4</strong> (22, 1559)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_4/patch_4_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_4_40.png" width="40" height="40" alt="Outdoor 4, point 4: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_4/patch_4_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_4_8.png" width="8" height="8" alt="Outdoor 4, point 4: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>5</strong> (135, 860)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_4/patch_5_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_5_40.png" width="40" height="40" alt="Outdoor 4, point 5: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_4/patch_5_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_5_8.png" width="8" height="8" alt="Outdoor 4, point 5: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>6</strong> (1061, 1343)</p><div class="patch-pair">
+<figure><a href="output/b2/set_1_4/patch_6_40.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_6_40.png" width="40" height="40" alt="Outdoor 4, point 6: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_1_4/patch_6_8.png" target="_blank" rel="noopener"><img src="output/b2/set_1_4/patch_6_8.png" width="8" height="8" alt="Outdoor 4, point 6: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+</div></div>
+<p class="small"><a href="output/b2/set_1_4/descriptors.npz" download>All descriptors (NPZ)</a> · <a href="output/b2/set_1_4/descriptors.csv" download>64-value vectors (CSV)</a> · <a href="output/b2/set_1_4/descriptors.json">Example coordinates</a></p></div>
+<div class="descriptor-panel" data-descriptor-image="set_2_1" hidden><div class="descriptor-layout">
+<figure class="descriptor-context"><a href="output/b2/set_2_1/examples.jpg" target="_blank" rel="noopener"><img src="output/b2/set_2_1/examples.jpg" alt="Kitchen 1: numbered descriptor windows" width="1280" height="1707" loading="lazy"></a><figcaption>Kitchen 1 · selected 40 × 40 windows</figcaption></figure><div class="descriptor-grid">
+<div class="descriptor-card"><p class="patch-label"><strong>1</strong> (795, 965)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_1/patch_1_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_1_40.png" width="40" height="40" alt="Kitchen 1, point 1: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_1/patch_1_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_1_8.png" width="8" height="8" alt="Kitchen 1, point 1: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>2</strong> (922, 1647)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_1/patch_2_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_2_40.png" width="40" height="40" alt="Kitchen 1, point 2: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_1/patch_2_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_2_8.png" width="8" height="8" alt="Kitchen 1, point 2: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>3</strong> (1015, 920)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_1/patch_3_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_3_40.png" width="40" height="40" alt="Kitchen 1, point 3: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_1/patch_3_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_3_8.png" width="8" height="8" alt="Kitchen 1, point 3: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>4</strong> (1202, 1174)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_1/patch_4_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_4_40.png" width="40" height="40" alt="Kitchen 1, point 4: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_1/patch_4_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_4_8.png" width="8" height="8" alt="Kitchen 1, point 4: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>5</strong> (276, 725)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_1/patch_5_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_5_40.png" width="40" height="40" alt="Kitchen 1, point 5: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_1/patch_5_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_5_8.png" width="8" height="8" alt="Kitchen 1, point 5: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>6</strong> (374, 1259)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_1/patch_6_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_6_40.png" width="40" height="40" alt="Kitchen 1, point 6: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_1/patch_6_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_1/patch_6_8.png" width="8" height="8" alt="Kitchen 1, point 6: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+</div></div>
+<p class="small"><a href="output/b2/set_2_1/descriptors.npz" download>All descriptors (NPZ)</a> · <a href="output/b2/set_2_1/descriptors.csv" download>64-value vectors (CSV)</a> · <a href="output/b2/set_2_1/descriptors.json">Example coordinates</a></p></div>
+<div class="descriptor-panel" data-descriptor-image="set_2_2"><div class="descriptor-layout">
+<figure class="descriptor-context"><a href="output/b2/set_2_2/examples.jpg" target="_blank" rel="noopener"><img src="output/b2/set_2_2/examples.jpg" alt="Kitchen 2: numbered descriptor windows" width="1280" height="1707" loading="lazy"></a><figcaption>Kitchen 2 · selected 40 × 40 windows</figcaption></figure><div class="descriptor-grid">
+<div class="descriptor-card"><p class="patch-label"><strong>1</strong> (511, 978)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_2/patch_1_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_1_40.png" width="40" height="40" alt="Kitchen 2, point 1: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_2/patch_1_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_1_8.png" width="8" height="8" alt="Kitchen 2, point 1: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>2</strong> (49, 1315)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_2/patch_2_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_2_40.png" width="40" height="40" alt="Kitchen 2, point 2: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_2/patch_2_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_2_8.png" width="8" height="8" alt="Kitchen 2, point 2: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>3</strong> (1090, 940)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_2/patch_3_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_3_40.png" width="40" height="40" alt="Kitchen 2, point 3: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_2/patch_3_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_3_8.png" width="8" height="8" alt="Kitchen 2, point 3: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>4</strong> (731, 977)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_2/patch_4_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_4_40.png" width="40" height="40" alt="Kitchen 2, point 4: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_2/patch_4_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_4_8.png" width="8" height="8" alt="Kitchen 2, point 4: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>5</strong> (854, 1151)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_2/patch_5_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_5_40.png" width="40" height="40" alt="Kitchen 2, point 5: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_2/patch_5_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_5_8.png" width="8" height="8" alt="Kitchen 2, point 5: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>6</strong> (307, 890)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_2/patch_6_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_6_40.png" width="40" height="40" alt="Kitchen 2, point 6: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_2/patch_6_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_2/patch_6_8.png" width="8" height="8" alt="Kitchen 2, point 6: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+</div></div>
+<p class="small"><a href="output/b2/set_2_2/descriptors.npz" download>All descriptors (NPZ)</a> · <a href="output/b2/set_2_2/descriptors.csv" download>64-value vectors (CSV)</a> · <a href="output/b2/set_2_2/descriptors.json">Example coordinates</a></p></div>
+<div class="descriptor-panel" data-descriptor-image="set_2_3" hidden><div class="descriptor-layout">
+<figure class="descriptor-context"><a href="output/b2/set_2_3/examples.jpg" target="_blank" rel="noopener"><img src="output/b2/set_2_3/examples.jpg" alt="Kitchen 3: numbered descriptor windows" width="1280" height="1707" loading="lazy"></a><figcaption>Kitchen 3 · selected 40 × 40 windows</figcaption></figure><div class="descriptor-grid">
+<div class="descriptor-card"><p class="patch-label"><strong>1</strong> (92, 954)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_3/patch_1_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_1_40.png" width="40" height="40" alt="Kitchen 3, point 1: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_3/patch_1_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_1_8.png" width="8" height="8" alt="Kitchen 3, point 1: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>2</strong> (482, 942)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_3/patch_2_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_2_40.png" width="40" height="40" alt="Kitchen 3, point 2: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_3/patch_2_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_2_8.png" width="8" height="8" alt="Kitchen 3, point 2: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>3</strong> (1075, 574)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_3/patch_3_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_3_40.png" width="40" height="40" alt="Kitchen 3, point 3: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_3/patch_3_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_3_8.png" width="8" height="8" alt="Kitchen 3, point 3: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>4</strong> (190, 1180)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_3/patch_4_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_4_40.png" width="40" height="40" alt="Kitchen 3, point 4: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_3/patch_4_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_4_8.png" width="8" height="8" alt="Kitchen 3, point 4: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>5</strong> (793, 891)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_3/patch_5_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_5_40.png" width="40" height="40" alt="Kitchen 3, point 5: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_3/patch_5_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_5_8.png" width="8" height="8" alt="Kitchen 3, point 5: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+<div class="descriptor-card"><p class="patch-label"><strong>6</strong> (963, 1201)</p><div class="patch-pair">
+<figure><a href="output/b2/set_2_3/patch_6_40.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_6_40.png" width="40" height="40" alt="Kitchen 3, point 6: 40 × 40 patch" loading="lazy"></a><figcaption>40 × 40</figcaption></figure>
+<figure><a href="output/b2/set_2_3/patch_6_8.png" target="_blank" rel="noopener"><img src="output/b2/set_2_3/patch_6_8.png" width="8" height="8" alt="Kitchen 3, point 6: 8 × 8 patch" loading="lazy"></a><figcaption>8 × 8</figcaption></figure>
+</div></div>
+</div></div>
+<p class="small"><a href="output/b2/set_2_3/descriptors.npz" download>All descriptors (NPZ)</a> · <a href="output/b2/set_2_3/descriptors.csv" download>64-value vectors (CSV)</a> · <a href="output/b2/set_2_3/descriptors.json">Example coordinates</a></p></div>
+<p class="small">Each numbered pair shows the unblurred 40 × 40 grayscale crop on the left and the normalized 8 × 8 descriptor on the right. Preview values use a fixed grayscale range [−3, 3]; the saved descriptors retain their signed values without clipping.</p>
+<div class="math-equations"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>d</mi><mo>=</mo><mfrac><mrow><mi>p</mi><mo>−</mo><mi>μ</mi></mrow><mi>σ</mi></mfrac><mo>,</mo><mspace width="1em"/><mi>μ</mi><mo>=</mo><mtext>mean(p)</mtext><mo>,</mo><mspace width="1em"/><mi>σ</mi><mo>=</mo><mtext>std(p)</mtext></mrow></math></div>
+<h3>Core code</h3>
+<pre><code>patch40 = blurred[y-20:y+20, x-20:x+20]
+patch8 = patch40[2::5, 2::5]
+mean, std = patch8.mean(), patch8.std()
+if std &gt;= min_std:
+    descriptor = ((patch8-mean)/std).reshape(64)</code></pre>
+<p class="small">Gaussian σ = 2 pixels before sampling; one sample every 5 pixels. Incomplete windows and patches with std &lt; 10<sup>−6</sup> are skipped. No rotation or Haar transform is used. <a href="descriptors.py">Extraction source</a> · <a href="b2_extract_descriptors.py">Generation script</a> · <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2005/06/cvpr05.pdf#page=3" target="_blank" rel="noopener">Brown et al., Section 4</a></p>
+<div class="table-wrap"><table><thead><tr><th>Image</th><th>ANMS points</th><th>Descriptors × dimensions</th><th>Skipped</th></tr></thead><tbody><tr><td>Outdoor 1</td><td>500</td><td>500 × 64</td><td>0</td></tr>
+<tr><td>Outdoor 2</td><td>500</td><td>500 × 64</td><td>0</td></tr>
+<tr><td>Outdoor 3</td><td>500</td><td>500 × 64</td><td>0</td></tr>
+<tr><td>Outdoor 4</td><td>500</td><td>500 × 64</td><td>0</td></tr>
+<tr><td>Kitchen 1</td><td>500</td><td>500 × 64</td><td>0</td></tr>
+<tr><td>Kitchen 2</td><td>500</td><td>500 × 64</td><td>0</td></tr>
+<tr><td>Kitchen 3</td><td>500</td><td>500 × 64</td><td>0</td></tr></tbody></table></div>
+<p class="small">The figures show six examples per image; descriptors are extracted for every valid ANMS point. All saved descriptors have mean ≈ 0 and standard deviation ≈ 1. <a href="output/b2/summary.csv">Normalization checks</a></p>
+</div>
+    <div id="b3" class="b-subsection"><h3>B.3 Feature Matching</h3><p>I compare each 64-value descriptor in the left image with all descriptors in the right image. I find its nearest and second-nearest neighbors and keep the nearest match only when its distance is clearly smaller.</p>
+<label class="pair-label" for="match-select">Image pair <select id="match-select"><option value="set_1_1_to_2">Outdoor 1 → 2</option>
+<option value="set_1_2_to_3">Outdoor 2 → 3</option>
+<option value="set_1_3_to_4">Outdoor 3 → 4</option>
+<option value="set_2_1_to_2" selected>Kitchen 1 → 2</option>
+<option value="set_2_2_to_3">Kitchen 2 → 3</option></select></label>
+<div class="match-panel" data-match-pair="set_1_1_to_2" hidden><figure><a href="output/b3/set_1_1_to_2/matches_preview.jpg" target="_blank" rel="noopener"><img src="output/b3/set_1_1_to_2/matches_preview.jpg" width="2592" height="1749" alt="Outdoor 1 → 2: automatically matched features after the ratio test" loading="lazy"></a><figcaption>Outdoor 1 → 2 · 40 of 131 retained matches · lowest distance ratios</figcaption></figure>
+<p class="small"><a href="output/b3/set_1_1_to_2/matches_all.jpg" target="_blank" rel="noopener">All 131 matches</a> · <a href="output/b3/set_1_1_to_2/matches.csv" download>Match coordinates (CSV)</a> · <a href="output/b3/set_1_1_to_2/matches.npz" download>Matches (NPZ)</a> · <a href="output/b3/set_1_1_to_2/queries.csv" download>All nearest-neighbor tests</a></p></div>
+<div class="match-panel" data-match-pair="set_1_2_to_3" hidden><figure><a href="output/b3/set_1_2_to_3/matches_preview.jpg" target="_blank" rel="noopener"><img src="output/b3/set_1_2_to_3/matches_preview.jpg" width="2592" height="1749" alt="Outdoor 2 → 3: automatically matched features after the ratio test" loading="lazy"></a><figcaption>Outdoor 2 → 3 · 40 of 122 retained matches · lowest distance ratios</figcaption></figure>
+<p class="small"><a href="output/b3/set_1_2_to_3/matches_all.jpg" target="_blank" rel="noopener">All 122 matches</a> · <a href="output/b3/set_1_2_to_3/matches.csv" download>Match coordinates (CSV)</a> · <a href="output/b3/set_1_2_to_3/matches.npz" download>Matches (NPZ)</a> · <a href="output/b3/set_1_2_to_3/queries.csv" download>All nearest-neighbor tests</a></p></div>
+<div class="match-panel" data-match-pair="set_1_3_to_4" hidden><figure><a href="output/b3/set_1_3_to_4/matches_preview.jpg" target="_blank" rel="noopener"><img src="output/b3/set_1_3_to_4/matches_preview.jpg" width="2592" height="1749" alt="Outdoor 3 → 4: automatically matched features after the ratio test" loading="lazy"></a><figcaption>Outdoor 3 → 4 · 22 of 22 retained matches · lowest distance ratios</figcaption></figure>
+<p class="small"><a href="output/b3/set_1_3_to_4/matches_all.jpg" target="_blank" rel="noopener">All 22 matches</a> · <a href="output/b3/set_1_3_to_4/matches.csv" download>Match coordinates (CSV)</a> · <a href="output/b3/set_1_3_to_4/matches.npz" download>Matches (NPZ)</a> · <a href="output/b3/set_1_3_to_4/queries.csv" download>All nearest-neighbor tests</a></p></div>
+<div class="match-panel" data-match-pair="set_2_1_to_2"><figure><a href="output/b3/set_2_1_to_2/matches_preview.jpg" target="_blank" rel="noopener"><img src="output/b3/set_2_1_to_2/matches_preview.jpg" width="2592" height="1749" alt="Kitchen 1 → 2: automatically matched features after the ratio test" loading="lazy"></a><figcaption>Kitchen 1 → 2 · 40 of 163 retained matches · lowest distance ratios</figcaption></figure>
+<p class="small"><a href="output/b3/set_2_1_to_2/matches_all.jpg" target="_blank" rel="noopener">All 163 matches</a> · <a href="output/b3/set_2_1_to_2/matches.csv" download>Match coordinates (CSV)</a> · <a href="output/b3/set_2_1_to_2/matches.npz" download>Matches (NPZ)</a> · <a href="output/b3/set_2_1_to_2/queries.csv" download>All nearest-neighbor tests</a></p></div>
+<div class="match-panel" data-match-pair="set_2_2_to_3" hidden><figure><a href="output/b3/set_2_2_to_3/matches_preview.jpg" target="_blank" rel="noopener"><img src="output/b3/set_2_2_to_3/matches_preview.jpg" width="2592" height="1749" alt="Kitchen 2 → 3: automatically matched features after the ratio test" loading="lazy"></a><figcaption>Kitchen 2 → 3 · 40 of 55 retained matches · lowest distance ratios</figcaption></figure>
+<p class="small"><a href="output/b3/set_2_2_to_3/matches_all.jpg" target="_blank" rel="noopener">All 55 matches</a> · <a href="output/b3/set_2_2_to_3/matches.csv" download>Match coordinates (CSV)</a> · <a href="output/b3/set_2_2_to_3/matches.npz" download>Matches (NPZ)</a> · <a href="output/b3/set_2_2_to_3/queries.csv" download>All nearest-neighbor tests</a></p></div>
+<h3>Nearest-neighbor ratio test</h3>
+<div class="math-equations"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><msub><mi>d</mi><mn>1</mn></msub><msub><mi>d</mi><mn>2</mn></msub></mfrac><mo>&lt;</mo><mn>0.7</mn></mrow></math></div>
+<p>d<sub>1</sub> and d<sub>2</sub> are the Euclidean distances to the closest and second-closest descriptors. I choose a threshold of 0.7; this corresponds to 0.49 for squared distances, as plotted in Figure 6b of the paper. Two zero-distance neighbors are ambiguous and are rejected.</p>
+<p>I also tried a threshold of 0.6, which removed 126 more matches compared with 0.7. Although it is stricter, it may also exclude correct matches, so I keep the threshold at 0.7.</p>
+<h3>Core code</h3>
+<pre><code>squared = np.maximum(np.sum(queries*queries, axis=1)[:, None]
+                     + norm_b[None, :] - 2*queries @ b.T, 0)
+order = np.argsort(squared, axis=1, kind="stable")[:, :2]
+rows = np.arange(stop-start)
+e1, e2 = squared[rows, order[:, 0]], squared[rows, order[:, 1]]
+squared_ratio = np.divide(e1, e2, out=np.full_like(e1, np.inf), where=e2 &gt; 1e-12)
+ratios[start:stop] = np.sqrt(squared_ratio)
+accepted = ratios &lt; ratio_threshold</code></pre>
+<p class="small"><a href="feature_matching.py">Matching source</a> · <a href="b3_match_features.py">Generation script</a> · <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2005/06/cvpr05.pdf#page=4" target="_blank" rel="noopener">Brown et al., Figure 6b and Section 5</a></p>
+<div class="table-wrap"><table><thead><tr><th>Pair</th><th>Matches</th><th>Queries retained</th><th>Median ratio</th></tr></thead><tbody><tr><td>Outdoor 1 → 2</td><td>131</td><td>26.2%</td><td>0.517</td></tr>
+<tr><td>Outdoor 2 → 3</td><td>122</td><td>24.4%</td><td>0.475</td></tr>
+<tr><td>Outdoor 3 → 4</td><td>22</td><td>4.4%</td><td>0.573</td></tr>
+<tr><td>Kitchen 1 → 2</td><td>163</td><td>32.6%</td><td>0.420</td></tr>
+<tr><td>Kitchen 2 → 3</td><td>55</td><td>11.0%</td><td>0.532</td></tr></tbody></table></div>
+<p class="small">Matching runs from left to right. All retained correspondences are saved at the original resolution. The preview shows up to 40 matches with the smallest ratios; the full figure includes every retained match. <a href="output/b3/summary.csv">Result data</a></p>
+<p>Repeated textures can still produce incorrect matches. These are descriptor-based candidates; B.4 uses RANSAC to check their geometric consistency.</p>
+</div>
+    <div id="b4" class="b-subsection"><h3>B.4 RANSAC &amp; Automatic Mosaics</h3><p>I use four-point RANSAC on the B.3 matches. I repeatedly sample four pairs, calculate H, and count matches with a reprojection error below 3 px, where error = ||position predicted by H − B.3 matched position||<sub>2</sub>. I skip degenerate samples, keep the largest consensus, and refit H using its inliers. The automatic H matrices use only automatically matched points. Then I use the method in A.4 to merge the pictures.</p>
+<h3>Outdoor 1 + 2</h3><div class="mosaic-sources">
+<figure><a href="photos/1/1.jpg" target="_blank" rel="noopener"><img src="photos/1/1.jpg" alt="Outdoor 1: original source" loading="lazy"></a><figcaption>Outdoor 1</figcaption></figure>
+<figure><a href="photos/1/2.jpg" target="_blank" rel="noopener"><img src="photos/1/2.jpg" alt="Outdoor 2: original source" loading="lazy"></a><figcaption>Outdoor 2</figcaption></figure>
+</div><p class="small"><strong>Uncropped</strong></p><div class="mosaic-results mosaic-full" id="full-auto-outdoor_1_2">
+<figure><a href="output/a4/outdoor_1_2/laplacian.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_1_2/laplacian.png" alt="Outdoor 1 + 2: Manual · uncropped" width="2075" height="2261" loading="lazy"></a><figcaption>Manual · uncropped · 2075 × 2261</figcaption></figure>
+<figure><a href="output/b4/mosaics/outdoor_1_2/automatic_laplacian.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_1_2/automatic_laplacian.png" alt="Outdoor 1 + 2: Automatic · uncropped" width="2041" height="2210" loading="lazy"></a><figcaption>Automatic · uncropped · 2041 × 2210</figcaption></figure>
+</div><p class="small"><strong>Shared crop</strong></p><div class="mosaic-results" id="auto-outdoor_1_2">
+<figure><a href="output/b4/mosaics/outdoor_1_2/manual_comparison.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_1_2/manual_comparison.png" alt="Outdoor 1 + 2: Manual points · Part A" width="1847" height="1707" loading="lazy"></a><figcaption>Manual points · Part A · shared crop</figcaption></figure>
+<figure><a href="output/b4/mosaics/outdoor_1_2/automatic_comparison.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_1_2/automatic_comparison.png" alt="Outdoor 1 + 2: Automatic matches · RANSAC" width="1847" height="1707" loading="lazy"></a><figcaption>Automatic matches · RANSAC · shared crop</figcaption></figure>
+</div>
+<p class="small">Reference: image 2. Full image: <a href="output/a4/outdoor_1_2/laplacian.png" target="_blank" rel="noopener">manual</a> / <a href="output/b4/mosaics/outdoor_1_2/automatic_laplacian.png" target="_blank" rel="noopener">automatic</a>. <a href="output/b4/mosaics/outdoor_1_2/automatic_feather.png" target="_blank" rel="noopener">Automatic feather blend</a> · <a href="output/b4/mosaics/outdoor_1_2/mosaic.json">H matrices and crop coordinates</a></p>
+<details><summary>Close-up: manual vs automatic</summary><div class="mosaic-results">
+<figure><a href="output/b4/mosaics/outdoor_1_2/manual_detail.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_1_2/manual_detail.png" alt="Outdoor 1 + 2: Manual · detail" loading="lazy"></a><figcaption>Manual · detail</figcaption></figure>
+<figure><a href="output/b4/mosaics/outdoor_1_2/automatic_detail.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_1_2/automatic_detail.png" alt="Outdoor 1 + 2: Automatic · same detail" loading="lazy"></a><figcaption>Automatic · same detail</figcaption></figure>
+</div></details>
+<h3>Outdoor 3 + 4</h3><div class="mosaic-sources">
+<figure><a href="photos/1/3.jpg" target="_blank" rel="noopener"><img src="photos/1/3.jpg" alt="Outdoor 3: original source" loading="lazy"></a><figcaption>Outdoor 3</figcaption></figure>
+<figure><a href="photos/1/4.jpg" target="_blank" rel="noopener"><img src="photos/1/4.jpg" alt="Outdoor 4: original source" loading="lazy"></a><figcaption>Outdoor 4</figcaption></figure>
+</div><p class="small"><strong>Uncropped</strong></p><div class="mosaic-results mosaic-full" id="full-auto-outdoor_3_4">
+<figure><a href="output/a4/outdoor_3_4/laplacian.png" target="_blank" rel="noopener"><img src="output/a4/outdoor_3_4/laplacian.png" alt="Outdoor 3 + 4: Manual · uncropped" width="2973" height="2752" loading="lazy"></a><figcaption>Manual · uncropped · 2973 × 2752</figcaption></figure>
+<figure><a href="output/b4/mosaics/outdoor_3_4/automatic_laplacian.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_3_4/automatic_laplacian.png" alt="Outdoor 3 + 4: Automatic · uncropped" width="3655" height="3831" loading="lazy"></a><figcaption>Automatic · uncropped · 3655 × 3831</figcaption></figure>
+</div><p class="small"><strong>Shared crop</strong></p><div class="mosaic-results" id="auto-outdoor_3_4">
+<figure><a href="output/b4/mosaics/outdoor_3_4/manual_comparison.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_3_4/manual_comparison.png" alt="Outdoor 3 + 4: Manual points · Part A" width="2858" height="1707" loading="lazy"></a><figcaption>Manual points · Part A · shared crop</figcaption></figure>
+<figure><a href="output/b4/mosaics/outdoor_3_4/automatic_comparison.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_3_4/automatic_comparison.png" alt="Outdoor 3 + 4: Automatic matches · RANSAC" width="2858" height="1707" loading="lazy"></a><figcaption>Automatic matches · RANSAC · shared crop</figcaption></figure>
+</div>
+<p class="small">Reference: image 4. Full image: <a href="output/a4/outdoor_3_4/laplacian.png" target="_blank" rel="noopener">manual</a> / <a href="output/b4/mosaics/outdoor_3_4/automatic_laplacian.png" target="_blank" rel="noopener">automatic</a>. <a href="output/b4/mosaics/outdoor_3_4/automatic_feather.png" target="_blank" rel="noopener">Automatic feather blend</a> · <a href="output/b4/mosaics/outdoor_3_4/mosaic.json">H matrices and crop coordinates</a></p>
+<details><summary>Close-up: manual vs automatic</summary><div class="mosaic-results">
+<figure><a href="output/b4/mosaics/outdoor_3_4/manual_detail.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_3_4/manual_detail.png" alt="Outdoor 3 + 4: Manual · detail" loading="lazy"></a><figcaption>Manual · detail</figcaption></figure>
+<figure><a href="output/b4/mosaics/outdoor_3_4/automatic_detail.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/outdoor_3_4/automatic_detail.png" alt="Outdoor 3 + 4: Automatic · same detail" loading="lazy"></a><figcaption>Automatic · same detail</figcaption></figure>
+</div></details>
+<h3>Kitchen 1 + 2 + 3</h3><div class="mosaic-sources">
+<figure><a href="photos/2/1.jpg" target="_blank" rel="noopener"><img src="photos/2/1.jpg" alt="Kitchen 1: original source" loading="lazy"></a><figcaption>Kitchen 1</figcaption></figure>
+<figure><a href="photos/2/2.jpg" target="_blank" rel="noopener"><img src="photos/2/2.jpg" alt="Kitchen 2: original source" loading="lazy"></a><figcaption>Kitchen 2</figcaption></figure>
+<figure><a href="photos/2/3.jpg" target="_blank" rel="noopener"><img src="photos/2/3.jpg" alt="Kitchen 3: original source" loading="lazy"></a><figcaption>Kitchen 3</figcaption></figure>
+</div><p class="small"><strong>Uncropped</strong></p><div class="mosaic-results mosaic-full" id="full-auto-kitchen_1_2_3">
+<figure><a href="output/a4/kitchen_1_2_3/laplacian.png" target="_blank" rel="noopener"><img src="output/a4/kitchen_1_2_3/laplacian.png" alt="Kitchen 1 + 2 + 3: Manual · uncropped" width="2594" height="2228" loading="lazy"></a><figcaption>Manual · uncropped · 2594 × 2228</figcaption></figure>
+<figure><a href="output/b4/mosaics/kitchen_1_2_3/automatic_laplacian.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/kitchen_1_2_3/automatic_laplacian.png" alt="Kitchen 1 + 2 + 3: Automatic · uncropped" width="2878" height="2711" loading="lazy"></a><figcaption>Automatic · uncropped · 2878 × 2711</figcaption></figure>
+</div><p class="small"><strong>Shared crop</strong></p><div class="mosaic-results" id="auto-kitchen_1_2_3">
+<figure><a href="output/b4/mosaics/kitchen_1_2_3/manual_comparison.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/kitchen_1_2_3/manual_comparison.png" alt="Kitchen 1 + 2 + 3: Manual points · Part A" width="2495" height="1682" loading="lazy"></a><figcaption>Manual points · Part A · shared crop</figcaption></figure>
+<figure><a href="output/b4/mosaics/kitchen_1_2_3/automatic_comparison.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/kitchen_1_2_3/automatic_comparison.png" alt="Kitchen 1 + 2 + 3: Automatic matches · RANSAC" width="2495" height="1682" loading="lazy"></a><figcaption>Automatic matches · RANSAC · shared crop</figcaption></figure>
+</div>
+<p class="small">Reference: image 2. Full image: <a href="output/a4/kitchen_1_2_3/laplacian.png" target="_blank" rel="noopener">manual</a> / <a href="output/b4/mosaics/kitchen_1_2_3/automatic_laplacian.png" target="_blank" rel="noopener">automatic</a>. <a href="output/b4/mosaics/kitchen_1_2_3/automatic_feather.png" target="_blank" rel="noopener">Automatic feather blend</a> · <a href="output/b4/mosaics/kitchen_1_2_3/mosaic.json">H matrices and crop coordinates</a></p>
+<details><summary>Close-up: manual vs automatic</summary><div class="mosaic-results">
+<figure><a href="output/b4/mosaics/kitchen_1_2_3/manual_detail.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/kitchen_1_2_3/manual_detail.png" alt="Kitchen 1 + 2 + 3: Manual · detail" loading="lazy"></a><figcaption>Manual · detail</figcaption></figure>
+<figure><a href="output/b4/mosaics/kitchen_1_2_3/automatic_detail.png" target="_blank" rel="noopener"><img src="output/b4/mosaics/kitchen_1_2_3/automatic_detail.png" alt="Kitchen 1 + 2 + 3: Automatic · same detail" loading="lazy"></a><figcaption>Automatic · same detail</figcaption></figure>
+</div></details>
+<p class="small">Both methods use the same original photos, reference view, bilinear warping, and six-level Laplacian blending. Uncropped images show each complete canvas, fitted to its column. The cropped comparisons use identical reference coordinates and the largest rectangle valid in both results.</p>
+<details><summary>RANSAC inliers and H matrices</summary>
+<label class="pair-label" for="ransac-select">Image pair <select id="ransac-select"><option value="set_1_1_to_2">Outdoor 1 → 2</option>
+<option value="set_1_2_to_3">Outdoor 2 → 3</option>
+<option value="set_1_3_to_4">Outdoor 3 → 4</option>
+<option value="set_2_1_to_2" selected>Kitchen 1 → 2</option>
+<option value="set_2_2_to_3">Kitchen 2 → 3</option></select></label>
+<div class="ransac-panel" data-ransac-pair="set_1_1_to_2" hidden><figure><a href="output/b4/pairs/set_1_1_to_2/inliers.jpg" target="_blank" rel="noopener"><img src="output/b4/pairs/set_1_1_to_2/inliers.jpg" alt="Outdoor 1 → 2: RANSAC inlier correspondences" width="2592" height="1749" loading="lazy"></a><figcaption>Outdoor 1 → 2 · 58 / 131 inliers · H maps left image to right image</figcaption></figure><pre>[   1.414004e+00  -1.194453e-01  -5.461932e+02 ]
+[   2.721567e-01   1.278140e+00  -2.341453e+02 ]
+[   3.320931e-04  -7.934800e-06   1.000000e+00 ]</pre>
+<p class="small"><a href="output/b4/pairs/set_1_1_to_2/rejected.jpg" target="_blank" rel="noopener">Rejected matches</a> · <a href="output/b4/pairs/set_1_1_to_2/point_errors.csv" download>All point errors (CSV)</a> · <a href="output/b4/pairs/set_1_1_to_2/ransac.json">H and sampling details</a> · <a href="output/b4/pairs/set_1_1_to_2/ransac.npz" download>RANSAC data (NPZ)</a></p></div>
+<div class="ransac-panel" data-ransac-pair="set_1_2_to_3" hidden><figure><a href="output/b4/pairs/set_1_2_to_3/inliers.jpg" target="_blank" rel="noopener"><img src="output/b4/pairs/set_1_2_to_3/inliers.jpg" alt="Outdoor 2 → 3: RANSAC inlier correspondences" width="2592" height="1749" loading="lazy"></a><figcaption>Outdoor 2 → 3 · 48 / 122 inliers · H maps left image to right image</figcaption></figure><pre>[   1.640274e+00  -1.257784e-03  -8.322178e+02 ]
+[   4.175466e-01   1.402160e+00  -3.123230e+02 ]
+[   5.241009e-04  -2.638732e-05   1.000000e+00 ]</pre>
+<p class="small"><a href="output/b4/pairs/set_1_2_to_3/rejected.jpg" target="_blank" rel="noopener">Rejected matches</a> · <a href="output/b4/pairs/set_1_2_to_3/point_errors.csv" download>All point errors (CSV)</a> · <a href="output/b4/pairs/set_1_2_to_3/ransac.json">H and sampling details</a> · <a href="output/b4/pairs/set_1_2_to_3/ransac.npz" download>RANSAC data (NPZ)</a></p></div>
+<div class="ransac-panel" data-ransac-pair="set_1_3_to_4" hidden><figure><a href="output/b4/pairs/set_1_3_to_4/inliers.jpg" target="_blank" rel="noopener"><img src="output/b4/pairs/set_1_3_to_4/inliers.jpg" alt="Outdoor 3 → 4: RANSAC inlier correspondences" width="2592" height="1749" loading="lazy"></a><figcaption>Outdoor 3 → 4 · 8 / 22 inliers · H maps left image to right image</figcaption></figure><pre>[   2.202319e+00  -3.086266e-02  -2.030149e+03 ]
+[   9.193161e-01   2.033264e+00  -8.879673e+02 ]
+[   1.051834e-03  -7.191505e-05   1.000000e+00 ]</pre>
+<p class="small"><a href="output/b4/pairs/set_1_3_to_4/rejected.jpg" target="_blank" rel="noopener">Rejected matches</a> · <a href="output/b4/pairs/set_1_3_to_4/point_errors.csv" download>All point errors (CSV)</a> · <a href="output/b4/pairs/set_1_3_to_4/ransac.json">H and sampling details</a> · <a href="output/b4/pairs/set_1_3_to_4/ransac.npz" download>RANSAC data (NPZ)</a></p></div>
+<div class="ransac-panel" data-ransac-pair="set_2_1_to_2"><figure><a href="output/b4/pairs/set_2_1_to_2/inliers.jpg" target="_blank" rel="noopener"><img src="output/b4/pairs/set_2_1_to_2/inliers.jpg" alt="Kitchen 1 → 2: RANSAC inlier correspondences" width="2592" height="1749" loading="lazy"></a><figcaption>Kitchen 1 → 2 · 70 / 163 inliers · H maps left image to right image</figcaption></figure><pre>[   1.349488e+00   9.336234e-03  -4.625513e+02 ]
+[   2.289355e-01   1.191830e+00  -1.450342e+02 ]
+[   2.902008e-04  -1.794678e-05   1.000000e+00 ]</pre>
+<p class="small"><a href="output/b4/pairs/set_2_1_to_2/rejected.jpg" target="_blank" rel="noopener">Rejected matches</a> · <a href="output/b4/pairs/set_2_1_to_2/point_errors.csv" download>All point errors (CSV)</a> · <a href="output/b4/pairs/set_2_1_to_2/ransac.json">H and sampling details</a> · <a href="output/b4/pairs/set_2_1_to_2/ransac.npz" download>RANSAC data (NPZ)</a></p></div>
+<div class="ransac-panel" data-ransac-pair="set_2_2_to_3" hidden><figure><a href="output/b4/pairs/set_2_2_to_3/inliers.jpg" target="_blank" rel="noopener"><img src="output/b4/pairs/set_2_2_to_3/inliers.jpg" alt="Kitchen 2 → 3: RANSAC inlier correspondences" width="2592" height="1749" loading="lazy"></a><figcaption>Kitchen 2 → 3 · 21 / 55 inliers · H maps left image to right image</figcaption></figure><pre>[   1.948078e+00   3.931352e-02  -1.297670e+03 ]
+[   5.388117e-01   1.719018e+00  -5.262888e+02 ]
+[   6.883215e-04   3.046926e-05   1.000000e+00 ]</pre>
+<p class="small"><a href="output/b4/pairs/set_2_2_to_3/rejected.jpg" target="_blank" rel="noopener">Rejected matches</a> · <a href="output/b4/pairs/set_2_2_to_3/point_errors.csv" download>All point errors (CSV)</a> · <a href="output/b4/pairs/set_2_2_to_3/ransac.json">H and sampling details</a> · <a href="output/b4/pairs/set_2_2_to_3/ransac.npz" download>RANSAC data (NPZ)</a></p></div>
+</details>
+<h3>Four-point RANSAC</h3>
+<pre>error_i = ||project(H p_i) − q_i||₂
+inlier if error_i &lt; 3 pixels</pre>
+<pre><code>sample = rng.choice(len(source), 4, replace=False)
+H = computeH(source[sample], target[sample])
+errors = reprojection_errors(source, target, H)
+inliers = errors &lt; threshold_px
+score = (int(inliers.sum()), -float(np.sum(errors[inliers]**2)))
+if score &gt; best_score:
+    best_score, best_mask = score, inliers
+H = computeH(source[best_mask], target[best_mask])</code></pre>
+<p class="small">The threshold is measured in original target-image pixels. Sampling uses fixed seeds starting at 671, an adaptive 99.9% confidence estimate, at least 200 valid hypotheses, and at most 5000 draws. After refitting, I recalculate the inliers until the set stabilizes or repeats. <a href="ransac.py">Full RANSAC source</a> · <a href="b4_autostitch.py">Generation script</a></p>
+<div class="table-wrap"><table><thead><tr><th>Pair</th><th>B.3 matches</th><th>Inliers</th><th>Inlier ratio</th><th>Inlier RMSE / px</th></tr></thead><tbody><tr><td>Outdoor 1 → 2</td><td>131</td><td>58</td><td>44.3%</td><td>1.619</td></tr>
+<tr><td>Outdoor 2 → 3</td><td>122</td><td>48</td><td>39.3%</td><td>1.445</td></tr>
+<tr><td>Outdoor 3 → 4</td><td>22</td><td>8</td><td>36.4%</td><td>1.122</td></tr>
+<tr><td>Kitchen 1 → 2</td><td>163</td><td>70</td><td>42.9%</td><td>1.385</td></tr>
+<tr><td>Kitchen 2 → 3</td><td>55</td><td>21</td><td>38.2%</td><td>1.357</td></tr></tbody></table></div>
+<p class="small">RMSE is measured on the selected inliers, so it does not measure independent alignment accuracy across the whole scene. <a href="output/b4/summary.csv">Result data</a></p>
+<p>Outdoor 3 → 4 has the fewest inliers (8), so its homography is supported by fewer features. RANSAC rejects inconsistent matches, but a single H still cannot align every depth when the photos contain parallax. For example, the roof edge is still misaligned. One possible reason is that I accidentally translated my phone while rotating it to take the pictures. <a href="https://visionbook.mit.edu/homography.html">Foundations of Computer Vision, Section 41.3</a> explains that panorama images should be taken by rotating the camera without translation.</p>
+<p>The manual and automatic results are broadly similar for Outdoor 1 + 2. The automatic Outdoor 3 + 4 result shows more foreground stretching. In the kitchen, the alignment between pictures 2 and 3 looks better because the cupboards line up this time. However, a funny thing is that the orange cup seems to have disappeared. This might be because, due to the misalignment, the cup appears in different positions in the two photos, and the blending seam happens to discard the portions of both photos that contain the cup.</p>
+</div>
+  </section>
+  <aside class="final-note" id="final-thought" aria-label="A final thought">
+    <p>What if the imperfections in my merged panoramas are not a problem with the algorithm, but a problem with the real world?</p>
+  </aside>
+</main>
+<footer class="shell"><strong>Ke Yang <span>/ SYDE 671 · Assignment 3</span></strong><a href="https://github.com/Wade-yyk/connect-the-world" target="_blank" rel="noopener">Code ↗</a></footer>
+</body>
+</html>

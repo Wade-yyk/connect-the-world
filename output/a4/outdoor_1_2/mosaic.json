@@ -1,0 +1,143 @@
+{
+  "id": "outdoor_1_2",
+  "title": "Outdoor 1 + 2",
+  "sources": [
+    "photos/1/1.jpg",
+    "photos/1/2.jpg"
+  ],
+  "reference_image": "photos/1/2.jpg",
+  "reference_origin_xy": [
+    -795,
+    -219
+  ],
+  "output_size": [
+    2075,
+    2261
+  ],
+  "source_to_reference_H": [
+    [
+      [
+        0.0024830279037312913,
+        -0.0001681398072736048,
+        -1.0
+      ],
+      [
+        0.0005896229363742434,
+        0.0021746419069371336,
+        -0.4022985248370898
+      ],
+      [
+        6.696773031419449e-07,
+        -1.284459334511736e-07,
+        0.0018397529327030947
+      ]
+    ],
+    [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  ],
+  "source_to_canvas_H": [
+    [
+      [
+        0.0030154213597291374,
+        -0.0002702543243672878,
+        0.4626035814989603
+      ],
+      [
+        0.0007362822657623293,
+        0.0021465122475113267,
+        0.0006073674248879659
+      ],
+      [
+        6.696773031419449e-07,
+        -1.284459334511736e-07,
+        0.0018397529327030947
+      ]
+    ],
+    [
+      [
+        1.0,
+        0.0,
+        795.0
+      ],
+      [
+        0.0,
+        1.0,
+        219.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  ],
+  "correspondences": [
+    {
+      "file": "correspondences/set_1_1_to_2.json",
+      "direction": "1 -> 2",
+      "points": 8,
+      "H": [
+        [
+          1.3496529124065868,
+          -0.09139260184603262,
+          -543.5512465963185
+        ],
+        [
+          0.3204902820880018,
+          1.182029319416274,
+          -218.66986467906014
+        ],
+        [
+          0.00036400393294006483,
+          -6.981694724761316e-05,
+          1.0
+        ]
+      ]
+    }
+  ],
+  "valid_pixels": 3620210,
+  "overlap_pixels": 1300018,
+  "mosaic": "output/a4/outdoor_1_2/mosaic.png",
+  "overwrite": "output/a4/outdoor_1_2/overwrite.png",
+  "cropped": "output/a4/outdoor_1_2/cropped.png",
+  "laplacian": "output/a4/outdoor_1_2/laplacian.png",
+  "laplacian_cropped": "output/a4/outdoor_1_2/laplacian_cropped.png",
+  "pyramid_levels": 6,
+  "detail_box_in_crop_ltrb": [
+    554,
+    597,
+    1108,
+    1194
+  ],
+  "feather_detail": "output/a4/outdoor_1_2/feather_detail.png",
+  "laplacian_detail": "output/a4/outdoor_1_2/laplacian_detail.png",
+  "crop_box_ltrb": [
+    228,
+    219,
+    2075,
+    1926
+  ],
+  "cropped_size": [
+    1847,
+    1707
+  ],
+  "valid_mask": "output/a4/outdoor_1_2/valid_mask.png",
+  "coverage": "output/a4/outdoor_1_2/coverage.png",
+  "record_path": "output/a4/outdoor_1_2/mosaic.json",
+  "overlap_percent": 35.9100162697744
+}

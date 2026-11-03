@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect the World · SYDE 671 Assignment 3</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/simple.css">
+  <script src="assets/results.js" defer></script>
+  <script src="assets/corners.js" defer></script>
+  <script src="assets/simple.js" defer></script>
+</head>
+<body>
+<header><div class="shell masthead"><a class="wordmark" href="#top">CONNECT<span>THE WORLD</span></a><div class="course">UNIVERSITY OF WATERLOO<span>SYDE 671 · Computational vision</span></div></div></header>
+<nav aria-label="Assignment sections"><div class="shell nav-inner"><a class="assignment" href="#top">ASSIGNMENT 03</a><div class="nav-links"><a href="#a1">A.1 Photos</a><a href="#a2">A.2 Homographies</a><a href="#a3">A.3</a><a href="#a4">A.4</a><a href="#part-b">Part B</a></div></div></nav>
+<main class="shell" id="top">
+  <div class="hero"><div class="eyebrow">[AUTO]STITCHING PHOTO MOSAICS</div><h1>Connect the <em>world.</em></h1></div>
+
+  <section id="a1">
+    <div class="section-heading"><span class="number">A.1</span><h2>Source Photos</h2></div>
+    <p>Two sets of overlapping photos: outdoor (4) and kitchen (3).</p>
+    $photo_sets
+  </section>
+
+  <section id="a2">
+    <div class="section-heading"><span class="number">A.2</span><h2>Recover Homographies</h2></div>
+    <p>I marked 8–9 corresponding points for each image pair and used least squares to calculate H. It maps the first image to the second.</p>
+    <label class="pair-label" for="pair-select">Image pair <select id="pair-select">$pair_options</select></label>
+    <figure class="matches"><a id="matches-link" href="$matches_image" target="_blank" rel="noopener"><img id="matches-image" src="$matches_image" alt="Numbered corresponding points in the selected image pair"></a><figcaption id="pair-caption">$pair_caption</figcaption></figure>
+    <h3>Recovered H</h3>
+    <p class="small">This is the H for the current image pair. Switch image pairs to see a different H.</p>
+    <pre id="matrix">$matrix</pre>
+
+    <h3>System of equations</h3>
+    <p>Set h<sub>33</sub> = 1 to fix the scaling factor. For each (x, y) in the left picture and the corresponding (u, v) in the right picture, we can get the following equations:</p>
+    <div class="math-equations">
+      <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>u</mi><mo>=</mo><mfrac><mrow><msub><mi>h</mi><mn>11</mn></msub><mi>x</mi><mo>+</mo><msub><mi>h</mi><mn>12</mn></msub><mi>y</mi><mo>+</mo><msub><mi>h</mi><mn>13</mn></msub></mrow><mrow><msub><mi>h</mi><mn>31</mn></msub><mi>x</mi><mo>+</mo><msub><mi>h</mi><mn>32</mn></msub><mi>y</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mrow></math>
+      <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>v</mi><mo>=</mo><mfrac><mrow><msub><mi>h</mi><mn>21</mn></msub><mi>x</mi><mo>+</mo><msub><mi>h</mi><mn>22</mn></msub><mi>y</mi><mo>+</mo><msub><mi>h</mi><mn>23</mn></msub></mrow><mrow><msub><mi>h</mi><mn>31</mn></msub><mi>x</mi><mo>+</mo><msub><mi>h</mi><mn>32</mn></msub><mi>y</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mrow></math>
+    </div>
+    <p>Remove the denominators to get the following matrix:</p>
+    <pre>[ x  y  1  0  0  0  -ux  -uy ] h = u
+[ 0  0  0  x  y  1  -vx  -vy ] h = v
+h = [h11 h12 h13 h21 h22 h23 h31 h32]ᵀ</pre>
+    <p>Since hand-marked points are not 100% precise for mapping, we use least squares to find the solution that best fits these points overall.</p>
+    <details><summary>Numerical A h = b for the selected pair</summary><pre id="system">$system</pre><a id="system-link" href="$system_path" download>Download equations (CSV)</a></details>
+
+    <h3>Core code</h3>
+    <pre><code>def computeH(im1_pts, im2_pts):
+    A, b = build_linear_system(im1_pts, im2_pts)
+    scales = np.linalg.norm(A, axis=0)
+    scales[scales == 0] = 1.0
+    z, _, rank, _ = np.linalg.lstsq(A / scales, b, rcond=None)
+    h = z / scales
+    return np.append(h, 1.0).reshape(3, 3)</code></pre>
+    <p class="small"><a href="homography.py">Full source</a> · <a id="matrix-link" href="$json_path" download>H and point errors</a></p>
+
+    <h3>Results</h3>
+    <div class="table-wrap"><table><thead><tr><th>Pair</th><th>Points</th><th>RMSE (px)</th><th>Max error (px)</th></tr></thead><tbody>$summary_rows</tbody></table></div>
+    <p class="small">Errors are measured on the marked points at the original resolution. Kitchen 2 → 3 has the largest error; point 8 should be checked.</p>
+  </section>
+
+  <section id="a3"><div class="section-heading"><span class="number">A.3</span><h2>Image Warping</h2></div>$a3_section</section>
+  <section id="a4"><div class="section-heading"><span class="number">A.4</span><h2>Mosaics</h2></div>$a4_section</section>
+  <section id="part-b">
+    <div class="section-heading"><span class="number">B</span><h2>Automatic Stitching</h2></div>
+    <p class="small"><a href="#b1">B.1 Corners</a> · <a href="#b2">B.2 Descriptors</a> · <a href="#b3">B.3 Matches</a> · <a href="#b4">B.4 RANSAC</a></p>
+    <div id="b1"><h3>B.1 Harris Corner Detection &amp; ANMS</h3>$b1_section</div>
+    <div id="b2" class="b-subsection"><h3>B.2 Feature Descriptor Extraction</h3>$b2_section</div>
+    <div id="b3" class="b-subsection"><h3>B.3 Feature Matching</h3>$b3_section</div>
+    <div id="b4" class="b-subsection"><h3>B.4 RANSAC &amp; Automatic Mosaics</h3>$b4_section</div>
+  </section>
+  <aside class="final-note" id="final-thought" aria-label="A final thought">
+    <p>What if the imperfections in my merged panoramas are not a problem with the algorithm, but a problem with the real world?</p>
+  </aside>
+</main>
+<footer class="shell"><strong>Ke Yang <span>/ SYDE 671 · Assignment 3</span></strong><a href="https://github.com/Wade-yyk/connect-the-world" target="_blank" rel="noopener">Code ↗</a></footer>
+</body>
+</html>

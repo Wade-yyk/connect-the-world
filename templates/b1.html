@@ -1,0 +1,24 @@
+<p>I detect Harris corners at a single scale, then implement ANMS to select up to $count points. I compare the strongest Harris points with the same number of ANMS points. All coordinates use the original image resolution, without subpixel refinement.</p>
+<label class="pair-label" for="corner-select">Image <select id="corner-select">$options</select></label>
+<div class="mosaic-results corner-results">
+  <figure><a id="harris-top-link" href="$harris_top" target="_blank" rel="noopener"><img id="harris-top-image" src="$harris_top" width="$width" height="$height" alt="Strongest Harris corners without ANMS"></a><figcaption id="harris-top-caption">$top_caption</figcaption></figure>
+  <figure><a id="anms-link" href="$anms_image" target="_blank" rel="noopener"><img id="anms-image" src="$anms_image" width="$width" height="$height" alt="Corners selected using ANMS"></a><figcaption id="anms-caption">$anms_caption</figcaption></figure>
+</div>
+<details><summary>All detected Harris candidates</summary><figure class="all-corners"><a id="harris-all-link" href="$harris_all" target="_blank" rel="noopener"><img id="harris-all-image" src="$harris_all" width="$width" height="$height" alt="All detected Harris candidates before count selection" loading="lazy"></a><figcaption id="harris-all-caption">$all_caption</figcaption></figure></details>
+<p class="small"><a id="corner-csv-link" href="$csv" download>All coordinates (CSV)</a> · <a id="corner-record-link" href="$record_path">Selected points (JSON)</a> · <a id="corner-npz-link" href="$features" download>Features (NPZ)</a></p>
+<h3>Method</h3>
+<p>I smooth the grayscale image, calculate its gradients, and form the Harris matrix M from the smoothed gradient products. If the image intensity changes significantly in two directions at a position, it might be a corner. I calculate its score based on <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2005/06/cvpr05.pdf#page=2" target="_blank" rel="noopener">Brown et al., <em>Multi-Image Matching using Multi-Scale Oriented Patches</em>, Section 2</a>. I use f = det(M) / trace(M) as the corner strength and keep positive 3 × 3 local maxima above $threshold_percent% of the peak response.</p>
+<pre>r_i = min_j ||p_i − p_j||, subject to f_i &lt; 0.9 f_j
+Keep the $count points with the largest r_i.</pre>
+<p>A candidate gets a large radius when there is no significantly stronger point nearby. ANMS favors these points, spreading the selection across textured areas. If no sufficiently stronger point exists, the radius is infinite.</p>
+<h3>Core ANMS code</h3>
+<pre><code>dx = points[start:stop, 0, None] - points[None, :, 0]
+dy = points[start:stop, 1, None] - points[None, :, 1]
+distance_squared = dx*dx + dy*dy
+stronger = strengths[start:stop, None] &lt; c_robust*strengths[None, :]
+distance_squared[~stronger] = np.inf
+radii[start:stop] = np.sqrt(distance_squared.min(axis=1))</code></pre>
+<p class="small">σ<sub>d</sub> = 1.0, σ<sub>i</sub> = 1.5; c<sub>robust</sub> = 0.9. A 20-pixel border is excluded to leave room for the later 40 × 40 descriptors. <a href="corners.py">Harris and ANMS source</a> · <a href="b1_detect_corners.py">Generation script</a> · <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2005/06/cvpr05.pdf" target="_blank" rel="noopener">Brown et al., sections 2–3</a></p>
+<p>I observed that without ANMS, the selected points tended to concentrate in areas with rich texture. With ANMS, the points were more spread out across the image.</p>
+<div class="table-wrap"><table><thead><tr><th>Image</th><th>Candidates</th><th>Kept</th><th>Top Harris cells*</th><th>ANMS cells*</th></tr></thead><tbody>$result_rows</tbody></table></div>
+<p class="small">*Occupied cells in an 8 × 6 grid (48 cells). Both selections contain the same number of points. ANMS improves spatial coverage, but smooth regions such as the sky still have few corners. <a href="output/b1/summary.csv">Result data</a></p>

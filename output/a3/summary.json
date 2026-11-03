@@ -1,0 +1,246 @@
+{
+  "method": "Inverse warping; nearest neighbor and four-sample bilinear interpolation implemented in NumPy",
+  "corner_order": [
+    "top-left",
+    "top-right",
+    "bottom-right",
+    "bottom-left"
+  ],
+  "aspect_ratio_note": "Target aspect ratios are chosen for visualization; the physical dimensions were not measured.",
+  "timing": {
+    "repeats": 7,
+    "warmups_per_method": 1,
+    "statistic": "median",
+    "includes": "array validation, inverse coordinate mapping, interpolation, output and mask allocation",
+    "excludes": "image I/O, annotations, homography recovery, webpage generation",
+    "order": "alternating nearest-first and bilinear-first"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5"
+  },
+  "examples": [
+    {
+      "id": "window",
+      "title": "Window",
+      "image": "photos/1/4.jpg",
+      "source_size": [
+        1280,
+        1707
+      ],
+      "source_points": [
+        [
+          731.371,
+          239.204
+        ],
+        [
+          811.427,
+          216.331
+        ],
+        [
+          817.665,
+          365.006
+        ],
+        [
+          733.45,
+          384.76
+        ]
+      ],
+      "target_size": [
+        360,
+        640
+      ],
+      "zoom_box": [
+        140,
+        280,
+        220,
+        360
+      ],
+      "selected_by": "user",
+      "target_points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          359.0,
+          0.0
+        ],
+        [
+          359.0,
+          639.0
+        ],
+        [
+          0.0,
+          639.0
+        ]
+      ],
+      "H": [
+        [
+          7.734346881522562,
+          -0.1104709332949961,
+          -5630.251923958143
+        ],
+        [
+          2.2089616036618827,
+          7.731413900352206,
+          -3464.955587651644
+        ],
+        [
+          0.0007512882742214729,
+          0.0005646932925878698,
+          1.0
+        ]
+      ],
+      "corner_fit_max_error_px": 1.4185361731562501e-12,
+      "valid_pixel_count": 230400,
+      "source_crop_box": [
+        706,
+        191,
+        843,
+        411
+      ],
+      "zoom_scale": 4,
+      "source_crop": "output/a3/window/source_crop.png",
+      "source_annotated": "output/a3/window/source_points.png",
+      "nearest_image": "output/a3/window/nearest.png",
+      "bilinear_image": "output/a3/window/bilinear.png",
+      "detail_nearest": "output/a3/window/detail_nearest.png",
+      "detail_bilinear": "output/a3/window/detail_bilinear.png",
+      "record_path": "output/a3/window/rectification.json",
+      "nearest_ms": 7.9597000003559515,
+      "bilinear_ms": 31.59579999919515,
+      "raw_timings_ms": {
+        "nearest": [
+          7.161700006690808,
+          7.721200003288686,
+          8.057600003667176,
+          8.683800013386644,
+          7.9597000003559515,
+          7.701700000325218,
+          7.960200004163198
+        ],
+        "bilinear": [
+          33.97380000387784,
+          33.63010000612121,
+          31.456900003831834,
+          31.59579999919515,
+          32.65480000118259,
+          31.26920000067912,
+          30.76350000628736
+        ]
+      }
+    },
+    {
+      "id": "cabinet",
+      "title": "Kitchen cabinets",
+      "image": "photos/2/3.jpg",
+      "source_size": [
+        1280,
+        1707
+      ],
+      "source_points": [
+        [
+          252.428,
+          592.612
+        ],
+        [
+          504.031,
+          607.168
+        ],
+        [
+          506.111,
+          813.025
+        ],
+        [
+          259.706,
+          816.144
+        ]
+      ],
+      "target_size": [
+        840,
+        400
+      ],
+      "zoom_box": [
+        380,
+        160,
+        460,
+        240
+      ],
+      "selected_by": "user",
+      "target_points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          839.0,
+          0.0
+        ],
+        [
+          839.0,
+          399.0
+        ],
+        [
+          0.0,
+          399.0
+        ]
+      ],
+      "H": [
+        [
+          2.733225200102911,
+          -0.08899134354968874,
+          -637.2052327279084
+        ],
+        [
+          -0.09010094636953635,
+          1.5574105804764475,
+          -900.1961972271396
+        ],
+        [
+          -0.00027611541826617686,
+          -7.036213877184825e-05,
+          1.0
+        ]
+      ],
+      "corner_fit_max_error_px": 1.3589889175539397e-12,
+      "valid_pixel_count": 336000,
+      "source_crop_box": [
+        214,
+        559,
+        545,
+        850
+      ],
+      "zoom_scale": 4,
+      "source_crop": "output/a3/cabinet/source_crop.png",
+      "source_annotated": "output/a3/cabinet/source_points.png",
+      "nearest_image": "output/a3/cabinet/nearest.png",
+      "bilinear_image": "output/a3/cabinet/bilinear.png",
+      "detail_nearest": "output/a3/cabinet/detail_nearest.png",
+      "detail_bilinear": "output/a3/cabinet/detail_bilinear.png",
+      "record_path": "output/a3/cabinet/rectification.json",
+      "nearest_ms": 11.638299998594448,
+      "bilinear_ms": 44.14559999713674,
+      "raw_timings_ms": {
+        "nearest": [
+          12.896999993245117,
+          12.885799995274283,
+          13.424200005829334,
+          11.183800001163036,
+          11.638299998594448,
+          11.307399996439926,
+          11.25490000413265
+        ],
+        "bilinear": [
+          44.27959999884479,
+          43.087899990496226,
+          44.80139999941457,
+          43.74839999945834,
+          44.728099994244985,
+          44.14559999713674,
+          42.759900010423735
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "corner_order": [
+    "top-left",
+    "top-right",
+    "bottom-right",
+    "bottom-left"
+  ],
+  "coordinate_system": "EXIF-oriented original pixels; (0,0) is first pixel center",
+  "aspect_ratio_note": "Target aspect ratios are chosen for visualization; the physical dimensions were not measured.",
+  "examples": [
+    {
+      "id": "window",
+      "title": "Window",
+      "image": "photos/1/4.jpg",
+      "source_size": [
+        1280,
+        1707
+      ],
+      "source_points": [
+        [
+          731.371,
+          239.204
+        ],
+        [
+          811.427,
+          216.331
+        ],
+        [
+          817.665,
+          365.006
+        ],
+        [
+          733.45,
+          384.76
+        ]
+      ],
+      "target_size": [
+        360,
+        640
+      ],
+      "zoom_box": [
+        140,
+        280,
+        220,
+        360
+      ],
+      "selected_by": "user"
+    },
+    {
+      "id": "cabinet",
+      "title": "Kitchen cabinets",
+      "image": "photos/2/3.jpg",
+      "source_size": [
+        1280,
+        1707
+      ],
+      "source_points": [
+        [
+          101,
+          584
+        ],
+        [
+          617,
+          608
+        ],
+        [
+          618,
+          830
+        ],
+        [
+          111,
+          842
+        ]
+      ],
+      "target_size": [
+        840,
+        400
+      ],
+      "zoom_box": [
+        205,
+        240,
+        285,
+        320
+      ]
+    }
+  ]
+}

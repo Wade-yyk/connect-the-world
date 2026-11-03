@@ -1,0 +1,23 @@
+<p>I select four corners of a rectangular object and use computeH() to map them to a rectangle. For each output pixel, I use H⁻¹ to find its position in the original image.</p>
+$examples
+<p>Suppose the position found in the original image is (100.1, 50.9). For nearest-neighbor interpolation, we choose the nearest pixel, (100, 51). For bilinear interpolation, we use the four surrounding pixels to calculate a weighted value:</p>
+<div class="math-equations">
+  <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>dx</mi><mo>=</mo><mn>100.1</mn><mo>−</mo><mn>100</mn><mo>=</mo><mn>0.1</mn><mo>,</mo><mspace width="1em"/><mi>dy</mi><mo>=</mo><mn>50.9</mn><mo>−</mo><mn>50</mn><mo>=</mo><mn>0.9</mn></mrow></math>
+  <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable columnalign="left"><mtr><mtd><mrow><mi>C</mi><mo>=</mo><mn>0.09</mn><mi>I</mi><mo>(</mo><mn>100</mn><mo>,</mo><mn>50</mn><mo>)</mo><mo>+</mo><mn>0.01</mn><mi>I</mi><mo>(</mo><mn>101</mn><mo>,</mo><mn>50</mn><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mrow><mspace width="2em"/><mo>+</mo><mn>0.81</mn><mi>I</mi><mo>(</mo><mn>100</mn><mo>,</mo><mn>51</mn><mo>)</mo><mo>+</mo><mn>0.09</mn><mi>I</mi><mo>(</mo><mn>101</mn><mo>,</mo><mn>51</mn><mo>)</mo></mrow></mtd></mtr></mtable></math>
+</div>
+<p class="small">I(x, y) is the color at pixel (x, y). The four weights are (1 − dx)(1 − dy), dx(1 − dy), (1 − dx)dy, and dxdy.</p>
+<p class="small">The target rectangle proportions are chosen for display; the physical dimensions were not measured. The original crops show the selected corners. Click any image to enlarge it.</p>
+<h3>Core interpolation</h3>
+<pre><code>x0, y0 = np.floor(x).astype(int), np.floor(y).astype(int)
+x1, y1 = np.minimum(x0 + 1, width - 1), np.minimum(y0 + 1, height - 1)
+dx, dy = x - x0, y - y0
+nearest = im[np.floor(y + 0.5).astype(int), np.floor(x + 0.5).astype(int)]
+bilinear = ((1-dx)*(1-dy)*im[y0, x0]
+          + dx*(1-dy)*im[y0, x1]
+          + (1-dx)*dy*im[y1, x0]
+          + dx*dy*im[y1, x1])</code></pre>
+<p class="small">Pixels outside the source image are marked invalid in a separate mask. <a href="warping.py">Full source</a> · <a href="correspondences/rectification/points.json">Selected corners</a></p>
+<h3>Speed &amp; quality</h3>
+<div class="table-wrap"><table><thead><tr><th>Example</th><th>Output (W × H)</th><th>Nearest / ms</th><th>Bilinear / ms</th></tr></thead><tbody>$timing_rows</tbody></table></div>
+<p class="small">Median of $repeats runs after one warm-up per method; image I/O and H estimation are excluded. Both methods use the same output canvas. <a href="output/a3/timings.csv">Timing data</a></p>
+<p>Nearest neighbor copies one pixel and produces visible pixel steps when enlarged. Bilinear uses four pixels, making edges smoother but softer. The table shows the measured speed difference.</p>

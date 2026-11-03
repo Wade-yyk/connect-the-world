@@ -1,0 +1,503 @@
+{
+  "method": "Manual least-squares H, shared full-bounds canvas, inverse bilinear warping, normalized feather blending",
+  "weight": "min(x+1, width-x, y+1, height-y), normalized to a peak of 1 in each source image",
+  "edge_note": "A one-pixel positive floor retains valid border pixels; invalid samples have zero weight.",
+  "comparison": "Same H, bilinear samples and canvas; overwrite uses source order, feather uses weighted averaging.",
+  "scene_note": "Three mosaics from two captured scenes: two outdoor pairs and one three-image kitchen mosaic.",
+  "crop_method": "Largest axis-aligned rectangle containing only valid mosaic pixels; right/bottom crop bounds are exclusive.",
+  "laplacian_method": {
+    "levels": 6,
+    "filter": "Separable binomial [1,4,6,4,1]/16; reflected padding; 2x down/up sampling",
+    "weights": "Binary ownership by largest source feather weight; Gaussian mask pyramid; normalized per scale",
+    "invalid_colors": "Extended from common feather result before filtering; original valid mask retained",
+    "controls": "Same input points, H matrices, canvas, bilinear warp, and crop; no exposure compensation or alignment changes"
+  },
+  "examples": [
+    {
+      "id": "outdoor_1_2",
+      "title": "Outdoor 1 + 2",
+      "sources": [
+        "photos/1/1.jpg",
+        "photos/1/2.jpg"
+      ],
+      "reference_image": "photos/1/2.jpg",
+      "reference_origin_xy": [
+        -795,
+        -219
+      ],
+      "output_size": [
+        2075,
+        2261
+      ],
+      "source_to_reference_H": [
+        [
+          [
+            0.0024830279037312913,
+            -0.0001681398072736048,
+            -1.0
+          ],
+          [
+            0.0005896229363742434,
+            0.0021746419069371336,
+            -0.4022985248370898
+          ],
+          [
+            6.696773031419449e-07,
+            -1.284459334511736e-07,
+            0.0018397529327030947
+          ]
+        ],
+        [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "source_to_canvas_H": [
+        [
+          [
+            0.0030154213597291374,
+            -0.0002702543243672878,
+            0.4626035814989603
+          ],
+          [
+            0.0007362822657623293,
+            0.0021465122475113267,
+            0.0006073674248879659
+          ],
+          [
+            6.696773031419449e-07,
+            -1.284459334511736e-07,
+            0.0018397529327030947
+          ]
+        ],
+        [
+          [
+            1.0,
+            0.0,
+            795.0
+          ],
+          [
+            0.0,
+            1.0,
+            219.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "correspondences": [
+        {
+          "file": "correspondences/set_1_1_to_2.json",
+          "direction": "1 -> 2",
+          "points": 8,
+          "H": [
+            [
+              1.3496529124065868,
+              -0.09139260184603262,
+              -543.5512465963185
+            ],
+            [
+              0.3204902820880018,
+              1.182029319416274,
+              -218.66986467906014
+            ],
+            [
+              0.00036400393294006483,
+              -6.981694724761316e-05,
+              1.0
+            ]
+          ]
+        }
+      ],
+      "valid_pixels": 3620210,
+      "overlap_pixels": 1300018,
+      "mosaic": "output/a4/outdoor_1_2/mosaic.png",
+      "overwrite": "output/a4/outdoor_1_2/overwrite.png",
+      "cropped": "output/a4/outdoor_1_2/cropped.png",
+      "laplacian": "output/a4/outdoor_1_2/laplacian.png",
+      "laplacian_cropped": "output/a4/outdoor_1_2/laplacian_cropped.png",
+      "pyramid_levels": 6,
+      "detail_box_in_crop_ltrb": [
+        554,
+        597,
+        1108,
+        1194
+      ],
+      "feather_detail": "output/a4/outdoor_1_2/feather_detail.png",
+      "laplacian_detail": "output/a4/outdoor_1_2/laplacian_detail.png",
+      "crop_box_ltrb": [
+        228,
+        219,
+        2075,
+        1926
+      ],
+      "cropped_size": [
+        1847,
+        1707
+      ],
+      "valid_mask": "output/a4/outdoor_1_2/valid_mask.png",
+      "coverage": "output/a4/outdoor_1_2/coverage.png",
+      "record_path": "output/a4/outdoor_1_2/mosaic.json",
+      "overlap_percent": 35.9100162697744
+    },
+    {
+      "id": "outdoor_3_4",
+      "title": "Outdoor 3 + 4",
+      "sources": [
+        "photos/1/3.jpg",
+        "photos/1/4.jpg"
+      ],
+      "reference_image": "photos/1/4.jpg",
+      "reference_origin_xy": [
+        -1693,
+        -533
+      ],
+      "output_size": [
+        2973,
+        2752
+      ],
+      "source_to_reference_H": [
+        [
+          [
+            0.0010865161881336138,
+            -2.717003103141061e-05,
+            -1.0
+          ],
+          [
+            0.0003555999363076143,
+            0.0010049139747870545,
+            -0.3433815149999594
+          ],
+          [
+            3.613450490703762e-07,
+            -1.5395249759640604e-08,
+            0.0006445638915869792
+          ]
+        ],
+        [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "source_to_canvas_H": [
+        [
+          [
+            0.0016982733562097606,
+            -5.3234188874482154e-05,
+            0.09124666845675575
+          ],
+          [
+            0.0005481968474621248,
+            0.0009967083066651661,
+            0.00017103921590050808
+          ],
+          [
+            3.613450490703762e-07,
+            -1.5395249759640604e-08,
+            0.0006445638915869792
+          ]
+        ],
+        [
+          [
+            1.0,
+            0.0,
+            1693.0
+          ],
+          [
+            0.0,
+            1.0,
+            533.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      ],
+      "correspondences": [
+        {
+          "file": "correspondences/set_1_3_to_4.json",
+          "direction": "3 -> 4",
+          "points": 9,
+          "H": [
+            [
+              1.6856609597824428,
+              -0.042152580040615284,
+              -1551.4365806900887
+            ],
+            [
+              0.5516907492786984,
+              1.5590603009313138,
+              -532.7346435037194
+            ],
+            [
+              0.0005606039273790367,
+              -2.388475364596673e-05,
+              1.0
+            ]
+          ]
+        }
+      ],
+      "valid_pixels": 5877022,
+      "overlap_pixels": 558057,
+      "mosaic": "output/a4/outdoor_3_4/mosaic.png",
+      "overwrite": "output/a4/outdoor_3_4/overwrite.png",
+      "cropped": "output/a4/outdoor_3_4/cropped.png",
+      "laplacian": "output/a4/outdoor_3_4/laplacian.png",
+      "laplacian_cropped": "output/a4/outdoor_3_4/laplacian_cropped.png",
+      "pyramid_levels": 6,
+      "detail_box_in_crop_ltrb": [
+        1228,
+        614,
+        1972,
+        1280
+      ],
+      "feather_detail": "output/a4/outdoor_3_4/feather_detail.png",
+      "laplacian_detail": "output/a4/outdoor_3_4/laplacian_detail.png",
+      "crop_box_ltrb": [
+        115,
+        533,
+        2973,
+        2240
+      ],
+      "cropped_size": [
+        2858,
+        1707
+      ],
+      "valid_mask": "output/a4/outdoor_3_4/valid_mask.png",
+      "coverage": "output/a4/outdoor_3_4/coverage.png",
+      "record_path": "output/a4/outdoor_3_4/mosaic.json",
+      "overlap_percent": 9.495574459309493
+    },
+    {
+      "id": "kitchen_1_2_3",
+      "title": "Kitchen 1 + 2 + 3",
+      "sources": [
+        "photos/2/1.jpg",
+        "photos/2/2.jpg",
+        "photos/2/3.jpg"
+      ],
+      "reference_image": "photos/2/2.jpg",
+      "reference_origin_xy": [
+        -454,
+        -242
+      ],
+      "output_size": [
+        2594,
+        2228
+      ],
+      "source_to_reference_H": [
+        [
+          [
+            0.0028875481663995454,
+            4.4752291246875834e-05,
+            -1.0
+          ],
+          [
+            0.00048661200752417674,
+            0.002533386769009504,
+            -0.28499604779058113
+          ],
+          [
+            6.082507888007398e-07,
+            -1.0792222970403842e-07,
+            0.0022186481098601944
+          ]
+        ],
+        [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0.0023007640783119553,
+            0.0005629479023659406,
+            1.0
+          ],
+          [
+            -5.303057963388225e-05,
+            0.002762227109473316,
+            -0.3776606504406006
+          ],
+          [
+            -2.2258334464069374e-07,
+            3.2823226540172436e-07,
+            0.002127964094013029
+          ]
+        ]
+      ],
+      "source_to_canvas_H": [
+        [
+          [
+            0.0031636940245150813,
+            -4.24440103875761e-06,
+            0.007266241876528276
+          ],
+          [
+            0.0006338086984139558,
+            0.002507269589421127,
+            0.25191679479558593
+          ],
+          [
+            6.082507888007398e-07,
+            -1.0792222970403842e-07,
+            0.0022186481098601944
+          ]
+        ],
+        [
+          [
+            1.0,
+            0.0,
+            454.0
+          ],
+          [
+            0.0,
+            1.0,
+            242.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0.0021997112398450805,
+            0.0007119653508583235,
+            1.9660956986819151
+          ],
+          [
+            -0.00010689574903693014,
+            0.0028416593177005333,
+            0.13730666031055244
+          ],
+          [
+            -2.2258334464069374e-07,
+            3.2823226540172436e-07,
+            0.002127964094013029
+          ]
+        ]
+      ],
+      "correspondences": [
+        {
+          "file": "correspondences/set_2_1_to_2.json",
+          "direction": "1 -> 2",
+          "points": 8,
+          "H": [
+            [
+              1.3014899269364084,
+              0.020170973056964785,
+              -450.724923684727
+            ],
+            [
+              0.21932815995540636,
+              1.1418605581257057,
+              -128.45482189085848
+            ],
+            [
+              0.00027415379036338847,
+              -4.8643238747238296e-05,
+              1.0
+            ]
+          ]
+        },
+        {
+          "file": "correspondences/set_2_2_to_3.json",
+          "direction": "2 -> 3",
+          "points": 8,
+          "H": [
+            [
+              0.9399842348138521,
+              -0.136208127527904,
+              -465.90291990390426
+            ],
+            [
+              0.03083875908010829,
+              0.8016378167722781,
+              127.77861289337547
+            ],
+            [
+              9.35648114080112e-05,
+              -0.00013789756041883083,
+              1.0
+            ]
+          ]
+        }
+      ],
+      "valid_pixels": 4908667,
+      "overlap_pixels": 2161737,
+      "mosaic": "output/a4/kitchen_1_2_3/mosaic.png",
+      "overwrite": "output/a4/kitchen_1_2_3/overwrite.png",
+      "cropped": "output/a4/kitchen_1_2_3/cropped.png",
+      "laplacian": "output/a4/kitchen_1_2_3/laplacian.png",
+      "laplacian_cropped": "output/a4/kitchen_1_2_3/laplacian_cropped.png",
+      "pyramid_levels": 6,
+      "detail_box_in_crop_ltrb": [
+        1122,
+        807,
+        1796,
+        1480
+      ],
+      "feather_detail": "output/a4/kitchen_1_2_3/feather_detail.png",
+      "laplacian_detail": "output/a4/kitchen_1_2_3/laplacian_detail.png",
+      "crop_box_ltrb": [
+        4,
+        242,
+        2499,
+        1924
+      ],
+      "cropped_size": [
+        2495,
+        1682
+      ],
+      "valid_mask": "output/a4/kitchen_1_2_3/valid_mask.png",
+      "coverage": "output/a4/kitchen_1_2_3/coverage.png",
+      "record_path": "output/a4/kitchen_1_2_3/mosaic.json",
+      "overlap_percent": 44.03918619861563
+    }
+  ]
+}

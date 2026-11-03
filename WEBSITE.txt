@@ -1,0 +1,87 @@
+SYDE 671 Assignment 3 - presentation website
+
+Double-click 打开作业网页.cmd to start http://127.0.0.1:8765/ and open it.
+Keep the console window open while previewing; close it to stop the server.
+Alternatively, open index.html directly in a browser (not a file-preview panel).
+The website works offline without an installation or build step.
+
+Contents
+  templates/index.html        Editable, concise assignment template
+  index.html                  Generated assignment page
+  assets/simple.css           Black/white/gold page styles
+  assets/simple.js            Image-pair selection
+  assets/results.js           Generated photo metadata and A.2 results
+  assets/corners.js           Generated B.1 metadata for image selection
+  output/a2/                  Detailed report, figures, H matrices, and CSVs
+  templates/a3.html           Short A.3 description and comparison template
+  warping.py                  Manual inverse warping and both interpolators
+  a3_rectify.py               Rectification images and measured timings
+  output/a3/                  A.3 images, masks, homographies, and timings
+  templates/a4.html           Short A.4 procedure and three mosaic comparisons
+  mosaicing.py                Shared canvas and normalized feather blending
+  pyramid_blending.py         Manual Gaussian/Laplacian pyramids and multiband blending
+  a4_mosaics.py               Three mosaics from existing manual points
+  output/a4/                  Mosaics, overwrite comparisons, masks, and H matrices
+                              Includes cropped.png: largest rectangle with no empty pixels
+                              laplacian.png / laplacian_cropped.png: six-level comparison
+  corners.py                  Single-scale Harris and exact ANMS in NumPy
+  b1_detect_corners.py         B.1 overlays and coordinate export for all seven photos
+  templates/b1.html           Concise B.1 comparison and equations
+  output/b1/                  Overlays, candidate/selected coordinates, and summary
+  descriptors.py              Blurred 40x40 to normalized 8x8 descriptors
+  b2_extract_descriptors.py    B.2 exports and six visual examples per photo
+  templates/b2.html           Feature windows and descriptor previews
+  output/b2/                  Float descriptors (NPZ/CSV), patches, and normalization checks
+  feature_matching.py         Exact two-neighbor matching and Euclidean ratio test
+  b3_match_features.py         Five adjacent-pair match figures and coordinate export
+  templates/b3.html           Match selection, equations, and results
+  output/b3/                  Full/preview matches, original-pixel pairs, and query audit
+  ransac.py                   Four-point RANSAC and consensus refitting from scratch
+  b4_autostitch.py            Five robust H estimates and three automatic mosaics
+  templates/b4.html           Manual/automatic comparisons and RANSAC results
+  output/b4/                  H, inliers, errors, full mosaics, and shared comparison crops
+
+Updating calculations
+  1. Edit point annotations using mark_points.py.
+  2. Run python a2_recover_homographies.py (or 运行A2.cmd).
+  3. Refresh index.html. A.2 also refreshes assets/results.js automatically.
+  To refresh the page after editing templates/index.html: python build_showcase.py.
+  To regenerate A.3: python a3_rectify.py (or 运行A3.cmd).
+  Edit correspondences/rectification/points.json to change the selected corners.
+  Or double-click 打开A3选点工具.cmd, choose four corners in two different photos,
+  save each example, then click the generate/update button.
+  To regenerate A.4: python a4_mosaics.py (or 运行A4.cmd).
+  A.4 reads the A.2 point files directly; regenerate it after changing those points.
+  To regenerate B.1: python b1_detect_corners.py (or 运行B1.cmd).
+  Optional: --count 500 --threshold-rel 0.005. Coordinates use original pixels.
+  To regenerate B.2: python b2_extract_descriptors.py (or 运行B2.cmd).
+  B.2 reads the saved B.1 ANMS points; rerun B.2 after regenerating B.1.
+  To regenerate B.3: python b3_match_features.py (or 运行B3.cmd).
+  Optional: --ratio 0.7 --preview-limit 40. B.3 reads B.2 descriptors directly.
+  The Euclidean distance ratio 0.7 corresponds to squared-distance ratio 0.49.
+  To regenerate B.4: python b4_autostitch.py (or 运行B4.cmd).
+  Optional: --threshold-px 3 --max-trials 5000 --seed 671.
+  B.4 reads B.3 matches and compares against the saved A.4 Laplacian mosaics.
+  Regenerate stages in order after changing upstream photos, points, or settings.
+
+Local HTTP preview (optional)
+  python -m http.server 8765 --bind 127.0.0.1
+  Open http://127.0.0.1:8765/
+
+Static hosting
+  The repository root is the site root. index.html, assets/, photos/, and
+  output/ must remain together. No external fonts, CDNs, or APIs are used.
+  The source is compatible with repository-root static hosting such as
+  GitHub Pages; hosting has not been configured or published by this change.
+
+Status
+  A.1: two original photo sets (4 + 3 photographs).
+  A.2: five manually annotated pairs and their least-squares estimates.
+  A.3: two rectifications, two manual interpolators, masks, and measured timings.
+  A.4: three feather-blended mosaics with source images and overwrite comparisons.
+       Two outdoor pairs and one three-image kitchen mosaic, from two scenes.
+  B.1: single-scale Harris, manually implemented ANMS, seven image comparisons.
+  B.2: 40x40 windows, Gaussian smoothing, normalized 8x8 descriptors for seven photos.
+  B.3: five adjacent-pair descriptor matches with nearest-neighbor ratio rejection.
+  B.4: hand-written four-point RANSAC; three automatic mosaics beside manual results.
+       Same source photos, reference view and blending; common valid comparison crops.

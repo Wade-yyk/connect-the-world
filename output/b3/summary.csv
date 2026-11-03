@@ -1,0 +1,6 @@
+pair,descriptors1,descriptors2,matches,retained_percent,median_ratio,ratio_threshold
+Outdoor 1 → 2,500,500,131,26.2,0.5167561239570764,0.7
+Outdoor 2 → 3,500,500,122,24.4,0.4749045056133275,0.7
+Outdoor 3 → 4,500,500,22,4.4,0.5727546498660432,0.7
+Kitchen 1 → 2,500,500,163,32.6,0.4199662707029217,0.7
+Kitchen 2 → 3,500,500,55,11.0,0.5324917916682204,0.7

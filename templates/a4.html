@@ -1,0 +1,27 @@
+<p>I reuse the manually marked points from A.2 and warp the images into one reference view using bilinear interpolation. I project all image corners to find a shared canvas, then blend the overlapping pixels with feather weights.</p>
+$examples
+<h3>Laplacian pyramid comparison</h3>
+<p>I also try a six-level Laplacian pyramid. I select the image with the largest feather weight at each pixel, then build Gaussian pyramids of these selection masks and Laplacian pyramids of the images. I blend each level and reconstruct the result. The finest level selects details from one image, while coarser levels blend across a wider region. Both methods use the same H matrices, bilinear warping, canvas, and crop.</p>
+<p class="small">The pyramid filters, downsampling, upsampling, and reconstruction are implemented in NumPy. No exposure correction or new alignment is applied. <a href="pyramid_blending.py">Pyramid source</a> · <a href="https://persci.mit.edu/pub_pdfs/spline83.pdf" target="_blank" rel="noopener">Burt &amp; Adelson, 1983</a></p>
+<p>The kitchen bottles and countertop details show less ghosting with the pyramid blend. Misaligned edges can still break at the selection boundary, and the outdoor brightness difference remains visible. The change improves some local details but does not fix the original alignment.</p>
+<h3>Weighted blending</h3>
+<p>Each source image has larger weights near its center and smaller weights near its edges. I warp the weights with the image and calculate:</p>
+<div class="math-equations"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>C</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><msub><mi>I</mi><mi>i</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo></mrow></mfrac></mrow></math></div>
+<p class="small">I<sub>i</sub> and w<sub>i</sub> are the warped color and weight of image i. Source weights use the distance to the nearest border, normalized to 1 at the center. A one-pixel floor keeps border pixels valid. Outside each image, the weight is 0; uncovered canvas pixels are transparent.</p>
+<h3>Core code</h3>
+<pre><code>for source, H in zip(sources, homographies):
+    source_with_alpha = np.dstack((source.astype(np.float32), feather_weights(source.shape)))
+    warped, valid = warpImageBilinear(source_with_alpha, H, (height, width),
+                                     origin=origin, return_mask=True)
+    weight = np.where(valid, warped[..., 3], 0)
+    color_sum += warped[..., :3] * weight[..., None]
+    weight_sum += weight
+
+np.divide(color_sum, weight_sum[..., None], out=color_sum,
+          where=weight_sum[..., None] &gt; 0)</code></pre>
+<p class="small"><a href="mosaicing.py">Blending source</a> · <a href="a4_mosaics.py">Generation script</a> · <a href="output/a4/summary.csv">Result data</a></p>
+<div class="table-wrap"><table><thead><tr><th>Mosaic</th><th>Images</th><th>Output (W × H)</th><th>Overlap*</th></tr></thead><tbody>$result_rows</tbody></table></div>
+<p class="small">*Pixels covered by at least two images, as a percentage of all valid mosaic pixels. These are three mosaics from two scenes: two outdoor pairs and one kitchen sequence.</p>
+<p><strong>Procedure:</strong> First, I choose Outdoor 1 and Outdoor 2, Outdoor 3 and Outdoor 4, and Kitchen 1, 2, and 3 to create three mosaics. I read the corresponding points marked in A.2 and use the H matrices computed from them. For the first set, I project Outdoor 1 into the view of Outdoor 2. For the second set, I project Outdoor 3 into the view of Outdoor 4. For the third set, I align all images to the view of Kitchen 2. Kitchen 1 uses H<sub>1→2</sub>, and Kitchen 3 uses H<sub>3→2</sub> = H<sub>2→3</sub><sup>−1</sup>. I apply the respective homography matrix H to the four corners of each photograph, then determine the minimum and maximum coordinates among all these corner points. If any coordinates are negative, I apply a global translation to shift everything into the canvas area. These ranges define the width and height of the final canvas. Then, using the method in A.3, I use H<sup>−1</sup> for each pixel in the canvas to find its position in the original image and calculate its color using bilinear interpolation. Next, I use feathering: the weight increases toward the center of each photo and decreases toward its edges. Finally, I calculate a weighted average in the overlapping regions.</p>
+<p>Feathering makes the image boundaries less abrupt than overwriting. It cannot correct misalignment, since hand marking is not 100% precise, especially in the kitchen, where the colors are more varied. Also, when blending Outdoor 3 and 4, I noticed a difference in brightness. This might be due to changes in backlighting as I rotated the camera and automatic adjustments made by the phone camera when taking the photos.</p>
+<p>Then I tried Laplacian pyramid blending. An image is selected based on the original feathering weights to preserve its set of outlines. The selected image regions are blended gradually across the coarser levels of the image pyramid, keeping the transitions between them natural. This resolved some of the ghosting problems, although some misalignment remains.</p>

@@ -1,0 +1,14 @@
+<p>I use the ANMS points from B.1. For each point, I smooth the grayscale image and sample its 40 × 40 window into an axis-aligned 8 × 8 patch. I normalize the 64 values to have a mean of 0 and a standard deviation of 1.</p>
+<label class="pair-label" for="descriptor-select">Image <select id="descriptor-select">$options</select></label>
+$panels
+<p class="small">Each numbered pair shows the unblurred 40 × 40 grayscale crop on the left and the normalized 8 × 8 descriptor on the right. Preview values use a fixed grayscale range [−3, 3]; the saved descriptors retain their signed values without clipping.</p>
+<div class="math-equations"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>d</mi><mo>=</mo><mfrac><mrow><mi>p</mi><mo>−</mo><mi>μ</mi></mrow><mi>σ</mi></mfrac><mo>,</mo><mspace width="1em"/><mi>μ</mi><mo>=</mo><mtext>mean(p)</mtext><mo>,</mo><mspace width="1em"/><mi>σ</mi><mo>=</mo><mtext>std(p)</mtext></mrow></math></div>
+<h3>Core code</h3>
+<pre><code>patch40 = blurred[y-20:y+20, x-20:x+20]
+patch8 = patch40[2::5, 2::5]
+mean, std = patch8.mean(), patch8.std()
+if std &gt;= min_std:
+    descriptor = ((patch8-mean)/std).reshape(64)</code></pre>
+<p class="small">Gaussian σ = 2 pixels before sampling; one sample every 5 pixels. Incomplete windows and patches with std &lt; 10<sup>−6</sup> are skipped. No rotation or Haar transform is used. <a href="descriptors.py">Extraction source</a> · <a href="b2_extract_descriptors.py">Generation script</a> · <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2005/06/cvpr05.pdf#page=3" target="_blank" rel="noopener">Brown et al., Section 4</a></p>
+<div class="table-wrap"><table><thead><tr><th>Image</th><th>ANMS points</th><th>Descriptors × dimensions</th><th>Skipped</th></tr></thead><tbody>$result_rows</tbody></table></div>
+<p class="small">The figures show six examples per image; descriptors are extracted for every valid ANMS point. All saved descriptors have mean ≈ 0 and standard deviation ≈ 1. <a href="output/b2/summary.csv">Normalization checks</a></p>

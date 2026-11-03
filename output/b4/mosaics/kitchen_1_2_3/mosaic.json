@@ -1,0 +1,167 @@
+{
+  "id": "kitchen_1_2_3",
+  "title": "Kitchen 1 + 2 + 3",
+  "sources": [
+    "photos/2/1.jpg",
+    "photos/2/2.jpg",
+    "photos/2/3.jpg"
+  ],
+  "reference_image": "photos/2/2.jpg",
+  "automatic_source_to_reference_H": [
+    [
+      [
+        0.0029174880767060154,
+        2.0184215879150912e-05,
+        -1.0
+      ],
+      [
+        0.0004949409333663205,
+        0.0025766446192722046,
+        -0.3135527491741773
+      ],
+      [
+        6.273916299284932e-07,
+        -3.879955404830928e-08,
+        0.0021619225917742296
+      ]
+    ],
+    [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.0007850824831210137,
+        -3.567944277158154e-05,
+        1.0
+      ],
+      [
+        -0.00040771781351991044,
+        0.0012856364095748122,
+        0.14753300398542454
+      ],
+      [
+        -5.279662723696305e-07,
+        -1.4613465197463334e-08,
+        0.00150568219481654
+      ]
+    ]
+  ],
+  "automatic_source_to_canvas_H": [
+    [
+      [
+        0.003207970401362908,
+        2.220022354783715e-06,
+        0.0009701599914683024
+      ],
+      [
+        0.0007778945584640709,
+        0.002559146020396417,
+        0.6614743397160002
+      ],
+      [
+        6.273916299284932e-07,
+        -3.879955404830928e-08,
+        0.0021619225917742296
+      ]
+    ],
+    [
+      [
+        1.0,
+        0.0,
+        463.0
+      ],
+      [
+        0.0,
+        1.0,
+        451.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.0005406340990138748,
+        -4.244547715800707e-05,
+        1.697130856200058
+      ],
+      [
+        -0.0006458306023586137,
+        0.001279045736770756,
+        0.8265956738476841
+      ],
+      [
+        -5.279662723696305e-07,
+        -1.4613465197463334e-08,
+        0.00150568219481654
+      ]
+    ]
+  ],
+  "automatic_origin_xy": [
+    -463,
+    -451
+  ],
+  "automatic_size": [
+    2878,
+    2711
+  ],
+  "manual_record": "output/a4/kitchen_1_2_3/mosaic.json",
+  "manual_full": "output/a4/kitchen_1_2_3/laplacian.png",
+  "automatic_full": "output/b4/mosaics/kitchen_1_2_3/automatic_laplacian.png",
+  "automatic_feather": "output/b4/mosaics/kitchen_1_2_3/automatic_feather.png",
+  "manual_comparison": "output/b4/mosaics/kitchen_1_2_3/manual_comparison.png",
+  "automatic_comparison": "output/b4/mosaics/kitchen_1_2_3/automatic_comparison.png",
+  "comparison_size": [
+    2495,
+    1682
+  ],
+  "common_reference_box_ltrb": [
+    -450,
+    0,
+    2045,
+    1682
+  ],
+  "manual_crop_box_ltrb": [
+    4,
+    242,
+    2499,
+    1924
+  ],
+  "automatic_crop_box_ltrb": [
+    13,
+    451,
+    2508,
+    2133
+  ],
+  "detail_box_in_common_crop": [
+    1047,
+    756,
+    1796,
+    1429
+  ],
+  "manual_detail": "output/b4/mosaics/kitchen_1_2_3/manual_detail.png",
+  "automatic_detail": "output/b4/mosaics/kitchen_1_2_3/automatic_detail.png",
+  "valid_mask": "output/b4/mosaics/kitchen_1_2_3/valid_mask.png",
+  "coverage": "output/b4/mosaics/kitchen_1_2_3/coverage.png",
+  "record_path": "output/b4/mosaics/kitchen_1_2_3/mosaic.json",
+  "pair_ids": [
+    "set_2_1_to_2",
+    "set_2_2_to_3"
+  ]
+}
